@@ -12,7 +12,7 @@ region = os.environ["REGION"]
 sm = boto3.client("sagemaker", region_name=region)
 
 # Get DB
-TABLE_NAME = "ppaModel-" + env_p
+TABLE_NAME = "Model-" + env_p
 db = boto3.resource("dynamodb")
 table = db.Table(TABLE_NAME)
 
@@ -44,9 +44,7 @@ def handler(event, context):
         training_start_time = response["TrainingStartTime"]
         training_end_time = response["TrainingEndTime"]
         params["trainingJobModelDataUrl"] = model_data_url
-        params["trainingJobStartTime"] = training_start_time.strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
+        params["trainingJobStartTime"] = training_start_time.strftime("%Y-%m-%d %H:%M:%S")
         params["trainingJobEndTime"] = training_end_time.strftime("%Y-%m-%d %H:%M:%S")
         table.update_item(
             Key={"model_name": model_name},
