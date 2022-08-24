@@ -38,7 +38,7 @@ def handler(event, context):
         model_tag = "default"
         if "tag" in event:
             model_tag = event["tag"]
-        name_prefix = "ppa"
+        name_prefix = "ppe"
         if "name" in event:
             name_prefix = event["name"]
         model_name = name_prefix + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")

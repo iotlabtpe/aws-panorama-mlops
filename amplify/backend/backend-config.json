@@ -39,22 +39,12 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
-    "ppaUploadMetricsToS3": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "triggerCodeBuild": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
     "listModel": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "ppaDeployment": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
