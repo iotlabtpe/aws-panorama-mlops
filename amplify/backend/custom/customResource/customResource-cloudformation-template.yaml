@@ -509,7 +509,7 @@ Resources:
             {
               "StartAt": "StartTrainingJob",
               "States": {
-                "StartTrainingJobGary": {
+                "StartTrainingJob": {
                   "Type": "Task",
                   "Resource": "arn:aws:states:::lambda:invoke",
                   "OutputPath": "$.Payload",
