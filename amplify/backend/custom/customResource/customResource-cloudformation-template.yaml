@@ -301,10 +301,12 @@ Resources:
                 https://github.com/hardco2020/aws-panorama-mlops-script.git
                 /home/ec2-user/ppe/
               - |
-                bash script/matlab_pull_and_push.sh ap-southeast-1
+                cd script
               - |
-                bash script/yolov5_pull_and_push.sh ap-southeast-1
-              - aws s3 cp script/training-input/ s3://
+                bash matlab_pull_and_push.sh ap-southeast-1
+              - |
+                bash yolov5_pull_and_push.sh ap-southeast-1
+              - aws s3 cp training-input/ s3://
               - Ref: S3BucketModelPretrainCreation
               - |
                 / --recursive

@@ -166,7 +166,10 @@ def get(event):
     panorama_client = boto3.client("panorama")
 
     try:
-        response = panorama_client.list_application_instances(MaxResults=25)
+        response = panorama_client.list_application_instances(
+            MaxResults=25,
+            StatusFilter="DEPLOYMENT_SUCCEEDED" | "DEPLOYMENT_ERROR" | "REMOVAL_FAILED" | "PROCESSING_DEPLOYMENT" | "PROCESSING_REMOVAL" | "DEPLOYMENT_FAILED",
+        )
         eprint(response["ResponseMetadata"]["HTTPStatusCode"])
 
         applications = []
