@@ -1,0 +1,10 @@
+{
+  "resourceName": "Camera",
+  "tableName": "Camera",
+  "partitionKey": {
+    "fieldName": "camera_id",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

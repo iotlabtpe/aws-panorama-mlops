@@ -1,0 +1,10 @@
+{
+  "resourceName": "Deployment",
+  "tableName": "Deployment",
+  "partitionKey": {
+    "fieldName": "DeploymentID",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

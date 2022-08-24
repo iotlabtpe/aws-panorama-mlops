@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "paths": {
+    "/camera": {
+      "name": "/camera",
+      "lambdaFunction": "cameraLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/device": {
+      "name": "/device",
+      "lambdaFunction": "deviceLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/training": {
+      "name": "/training",
+      "lambdaFunction": "invokeStep",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/model": {
+      "name": "/model",
+      "lambdaFunction": "listModel",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/exportEvent": {
+      "name": "/exportEvent",
+      "lambdaFunction": "exportEvent",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/verifyEvent": {
+      "name": "/verifyEvent",
+      "lambdaFunction": "verifyEvent",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/deployment": {
+      "name": "/deployment",
+      "lambdaFunction": "deploymentLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/event": {
+      "name": "/event",
+      "lambdaFunction": "listEvent",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

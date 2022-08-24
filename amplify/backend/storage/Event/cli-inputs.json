@@ -1,0 +1,14 @@
+{
+  "resourceName": "Event",
+  "tableName": "Event",
+  "partitionKey": {
+    "fieldName": "CameraID",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "TimeStamp",
+    "fieldType": "number"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

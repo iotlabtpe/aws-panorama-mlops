@@ -1,0 +1,734 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  {"createdOn":"Mac","createdBy":"Amplify","createdWith":"9.1.0","stackType":"custom-customCloudformation","metadata":{}}
+Parameters:
+  env:
+    Type: String
+    Default: dev
+    Description: Please input your amplify env name !!!
+Resources:
+  EnvParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name:
+        Fn::Join:
+          - /
+          - - /ppe/env
+            - Ref: env
+      Type: String
+      Value:
+        Ref: env
+      Description: Env Variable
+      Tags:
+        Environment: DEV
+  RandomParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name:
+        Fn::Join:
+          - /
+          - - /ppe/random
+            - Ref: env
+      Type: String
+      Value:
+        Fn::Select:
+          - 2
+          - Fn::Split:
+              - /
+              - Ref: AWS::StackId
+      Description: Random parameter for creating s3
+      Tags:
+        Environment: DEV
+  SageMakerParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name:
+        Fn::Join:
+          - /
+          - - /ppe/config/arn
+            - Ref: env
+      Type: String
+      Value:
+        Fn::GetAtt:
+          - SageMakerRole
+          - Arn
+      Description: Arn for sagemaker
+      Tags:
+        Environment: DEV
+  S3BucketModelCreation:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - '-'
+          - - ppebucket
+            - Fn::GetAtt:
+                - RandomParameter
+                - Value
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+  S3BucketPanoramaAppCreation:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - '-'
+          - - panorama-app
+            - Fn::GetAtt:
+                - RandomParameter
+                - Value
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+  S3BucketEventCreation:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - '-'
+          - - event
+            - Fn::GetAtt:
+                - RandomParameter
+                - Value
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+  S3BucketExportEventCreation:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - '-'
+          - - export-event
+            - Fn::GetAtt:
+                - RandomParameter
+                - Value
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+  S3BucketAppGraphCreation:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - '-'
+          - - app-graph
+            - Fn::GetAtt:
+                - RandomParameter
+                - Value
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+  S3BucketModelPretrainCreation:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - '-'
+          - - pretraininput
+            - Fn::GetAtt:
+                - RandomParameter
+                - Value
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+  S3BucketModelRetrainCreation:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Join:
+          - '-'
+          - - retrainoutput
+            - Fn::GetAtt:
+                - RandomParameter
+                - Value
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+  SageMakerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - sagemaker.amazonaws.com
+                - panorama.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sagemaker:*
+                Resource: '*'
+              - Effect: Allow
+                Action: iam:PassRole
+                Resource:
+                  Fn::Join:
+                    - ''
+                    - - 'arn:aws:iam::'
+                      - Ref: AWS::AccountId
+                      - ':role/amplifyppetest1LambdaRole*"'
+              - Effect: Allow
+                Action: s3:*
+                Resource: '*'
+              - Effect: Allow
+                Action: ecr:*
+                Resource: '*'
+              - Effect: Allow
+                Action: lambda:*
+                Resource: '*'
+              - Effect: Allow
+                Action: panorama:*
+                Resource: '*'
+              - Effect: Allow
+                Action: ssm:*
+                Resource: '*'
+              - Effect: Allow
+                Action: iot:*
+                Resource: '*'
+  WebAppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName:
+        Fn::Join:
+          - '-'
+          - - webapp-security-group
+            - Ref: env
+      GroupDescription: Allow HTTP/HTTPS and SSH inbound and outbound traffic
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 27.0.3.155/32
+  WebAppEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId:
+        Ref: BashInstance
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Join:
+              - '-'
+              - - webapp-eip
+                - Ref: env
+  BashInstance:
+    Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT3H
+    Properties:
+      AvailabilityZone:
+        Fn::Select:
+          - '0'
+          - Fn::GetAZs:
+              Ref: AWS::Region
+      SecurityGroupIds:
+        - Ref: WebAppSecurityGroup
+      KeyName:
+        Ref: BashKey
+      InstanceType: t2.micro
+      ImageId: ami-0c802847a7dd848c0
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: io1
+            Iops: '200'
+            VolumeSize: '30'
+            Encrypted: 'true'
+      IamInstanceProfile:
+        Ref: BashInstanceProfile
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ''
+            - - |
+                #!/bin/bash
+              - |
+                sudo yum update -y
+              - |
+                sudo yum install git -y
+              - |
+                sudo yum install docker -y
+              - |
+                sudo systemctl enable docker
+              - |
+                sudo service docker start
+              - |
+                sudo mkdir /home/ec2-user/ppa
+              - |
+                cd /home/ec2-user/ppa
+              - >
+                sudo git clone
+                https://github.com/hardco2020/ppa_model_script.git
+                /home/ec2-user/ppa/
+              - aws s3 cp training-input/ s3://
+              - Ref: S3BucketModelPretrainCreation
+              - |
+                / --recursive
+              - aws s3 cp panorama-app/ s3://
+              - Ref: S3BucketPanoramaAppCreation
+              - |
+                / --recursive
+              - '/opt/aws/bin/cfn-signal -e 0 --stack '
+              - Ref: AWS::StackName
+              - ' --resource BashInstance '
+              - ' --region '
+              - Ref: AWS::Region
+              - |+
+
+  BashInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: BashInstanceRole
+  BashInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - lambda.amazonaws.com
+                - states.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:*
+                  - ecr:*
+                  - ecs:*
+                  - s3:*
+                  - lambda:*
+                  - dynamodb:*
+                  - ssm:*
+                Resource: '*'
+  BashKey:
+    Type: AWS::EC2::KeyPair
+    Properties:
+      KeyName:
+        Fn::Join:
+          - '-'
+          - - BashKey
+            - Ref: env
+  StateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:*
+                  - ecr:*
+                  - ecs:*
+                  - s3:*
+                  - lambda:*
+                  - dynamodb:*
+                  - ssm:*
+                Resource: '*'
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - lambda.amazonaws.com
+                - states.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:*
+                  - ecr:*
+                  - ecs:*
+                  - s3:*
+                  - lambda:*
+                  - dynamodb:*
+                  - ssm:*
+                Resource: '*'
+  MetricPictrueLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ImageUri:
+          Fn::Join:
+            - ''
+            - - Ref: AWS::AccountId
+              - >-
+                .dkr.ecr.ap-southeast-1.amazonaws.com/python39-matplotlib-lambda:latest
+      PackageType: Image
+      FunctionName:
+        Fn::Join:
+          - '-'
+          - - metricToPicture
+            - Ref: env
+      Role:
+        Fn::GetAtt:
+          - LambdaRole
+          - Arn
+      Timeout: 300
+    DependsOn: BashInstance
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - lambda.amazonaws.com
+                - states.amazonaws.com
+                - codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:*
+                  - panorama:*
+                  - s3:*
+                  - lambda:*
+                  - ssm:*
+                  - codebuild:*
+                  - logs:*
+                  - dynamodb:*
+                  - states:*
+                Resource: '*'
+  BuildPanoramaApp:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name:
+        Fn::Join:
+          - '-'
+          - - Build-Panorama-App
+            - Ref: env
+      Description: Build Panorama App with Panorama Cli
+      ServiceRole:
+        Fn::GetAtt:
+          - CodeBuildRole
+          - Arn
+      Artifacts:
+        Type: no_artifacts
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_LARGE
+        Image: aws/codebuild/standard:5.0
+        PrivilegedMode: 'true'
+      Source:
+        BuildSpec: deployment/buildspec.yaml
+        Location: https://github.com/hardco2020/aws-ppe-test1.git
+        Type: GITHUB
+  ModelStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      StateMachineName:
+        Fn::Join:
+          - '-'
+          - - Retrain
+            - Ref: env
+      DefinitionString:
+        Fn::Sub:
+          - |
+            {
+              "StartAt": "StartTrainingJob",
+              "States": {
+                "StartTrainingJobGary": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:createTrainingJob-${Env}:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "CheckTrainingJobStatus"
+                },
+                "CheckTrainingJobStatus": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName":"arn:aws:lambda:${Region}:${AccountId}:function:checkTrainingJobStatus-${Env}:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "BranchTrainingJobStatus"
+                },
+                "BranchTrainingJobStatus": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.status",
+                      "StringEquals": "Completed",
+                      "Next": "UploadMetricsToS3"
+                    },
+                    {
+                      "Variable": "$.status",
+                      "StringEquals": "InProgress",
+                      "Next": "WaitTrainingJob"
+                    }
+                  ],
+                  "Default": "Fail"
+                },
+                "UploadMetricsToS3": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:uploadMetricsToS3-${Env}:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "MetricsToPicture"
+                },
+                "MetricsToPicture": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:metricToPicture:$LATEST",
+                    "Payload.$": "$"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "InvokeCodeBuild"
+                },
+                "InvokeCodeBuild": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+                  "Parameters": {
+                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:triggerCodeBuild-${Env}:$LATEST",
+                    "Payload": {
+                      "token.$": "$$.Task.Token",
+                      "otherInput.$": "$"
+                    }
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "End": true,
+                  "ResultPath": null
+                },
+                "WaitTrainingJob": {
+                  "Type": "Wait",
+                  "Seconds": 10,
+                  "Next": "CheckTrainingJobStatus"
+                },
+                "Fail": {
+                  "Type": "Fail"
+                }
+              }
+            }
+          - AccountId:
+              Ref: AWS::AccountId
+            Env:
+              Ref: env
+            Region:
+              Ref: AWS::Region
+            Resource: arn:aws-cn:states:::lambda:invoke
+      RoleArn:
+        Fn::GetAtt:
+          - StateMachineRole
+          - Arn
+  StateMachineParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name:
+        Fn::Join:
+          - /
+          - - /ppe/state/arn
+            - Ref: env
+      Type: String
+      Value:
+        Fn::GetAtt:
+          - ModelStateMachine
+          - Arn
+      Description: Random parameter for creating s3
+      Tags:
+        Environment: DEV
+  IotRule:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - iot.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:*
+                Resource: '*'
+  IotTopic:
+    Type: AWS::IoT::TopicRule
+    Properties:
+      RuleName:
+        Fn::Join:
+          - ''
+          - - ppeEvent
+            - Ref: env
+      TopicRulePayload:
+        Actions:
+          - DynamoDB:
+              HashKeyField: CameraID
+              HashKeyType: STRING
+              HashKeyValue: ${CameraID}
+              RangeKeyField: TimeStamp
+              RangeKeyType: NUMBER
+              RangeKeyValue: ${TimeStamp()}
+              RoleArn:
+                Fn::GetAtt:
+                  - IotRule
+                  - Arn
+              TableName:
+                Fn::Join:
+                  - '-'
+                  - - Event
+                    - Ref: env
+        Description: >-
+          Publish IOT topic for Panorama Devices to send alert message to
+          Database
+        Sql:
+          Fn::Join:
+            - ''
+            - - SELECT * FROM 'ppe/event/
+              - Ref: env
+              - ''''

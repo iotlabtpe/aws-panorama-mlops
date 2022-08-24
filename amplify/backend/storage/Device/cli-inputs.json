@@ -1,0 +1,10 @@
+{
+  "resourceName": "Device",
+  "tableName": "Device",
+  "partitionKey": {
+    "fieldName": "device_id",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

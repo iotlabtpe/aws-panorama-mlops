@@ -1,0 +1,10 @@
+{
+  "resourceName": "ppaModel",
+  "tableName": "ppaModel",
+  "partitionKey": {
+    "fieldName": "model_name",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}
