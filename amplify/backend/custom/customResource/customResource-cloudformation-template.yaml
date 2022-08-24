@@ -293,19 +293,19 @@ Resources:
               - |
                 sudo service docker start
               - |
-                sudo mkdir /home/ec2-user/ppa
+                sudo mkdir /home/ec2-user/ppe
               - |
-                cd /home/ec2-user/ppa
+                cd /home/ec2-user/ppe
               - >
                 sudo git clone
                 https://github.com/hardco2020/aws-panorama-mlops-script.git
-                /home/ec2-user/ppa/
+                /home/ec2-user/ppe/
+              - |
+                bash script/matlab_pull_and_push.sh ap-southeast-1
+              - |
+                bash script/yolov5_pull_and_push.sh ap-southeast-1
               - aws s3 cp script/training-input/ s3://
               - Ref: S3BucketModelPretrainCreation
-              - |
-                / --recursive
-              - aws s3 cp script/panorama-app/ s3://
-              - Ref: S3BucketPanoramaAppCreation
               - |
                 / --recursive
               - '/opt/aws/bin/cfn-signal -e 0 --stack '
