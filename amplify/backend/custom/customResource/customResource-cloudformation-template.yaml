@@ -598,7 +598,7 @@ Resources:
                   "Resource": "arn:aws:states:::lambda:invoke",
                   "OutputPath": "$.Payload",
                   "Parameters": {
-                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:metricToPicture:$LATEST",
+                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:metricToPicture-${Env}:$LATEST",
                     "Payload.$": "$"
                   },
                   "Retry": [
