@@ -1,9 +1,9 @@
 import json
 import boto3
-
+import os
 import sys
 
-env_p = boto3.client("ssm").get_parameter(Name="/ppe/env")["Parameter"]["Value"]
+env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])["Parameter"]["Value"]
 panorama_client = boto3.client("panorama")
 
 TABLE_NAME = "Device-" + env_p
