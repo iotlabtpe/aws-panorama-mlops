@@ -60,7 +60,7 @@ def handler(event, context):
             labels_prefix = event["labels_prefix"]
 
         # Create a role for training job to perform action successfully
-        role_arn = boto3.client("ssm").get_parameter(Name="/ppe/config/arn")["Parameter"]["Value"]
+        role_arn = boto3.client("ssm").get_parameter(Name="/ppe/config/arn/" + os.environ["ENV"])["Parameter"]["Value"]
         instance_type = "ml.p3.2xlarge"
         if "instance_type" in event:
             instance_type = event["instance_type"]
