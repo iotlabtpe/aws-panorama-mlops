@@ -404,4 +404,5 @@ Make sure to name your env name other than **dev**
 ## Developer Doc
 
 [Panorama MLOps Developer Installation document](https://github.com/hardco2020/aws-panorama-mlops/blob/main/DEVELOPER.md#installation-for-developer)
+
 [Panorama MLOps Development Documents](https://github.com/hardco2020/aws-panorama-mlops/blob/main/DEVELOPER.md)
