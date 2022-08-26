@@ -1,5 +1,270 @@
 # PPE Amplify Development Documents
 
+Please first install the PPE with following instructions so you can have a developer environment on your local environment.
+
+## Installation For Developer 
+
+### Note:
+
+* This a different set up than [README.md](https://github.com/hardco2020/aws-panorama-mlops/blob/main/README.md), if you wish to develop your own PPE, please use the following set up for your environm
+
+* PPE only support one region for now which is  **ap-southeast-1**, make sure you have admin access for the region.
+* You will need some basic knowledge of using **Terminal** and **AWS Console**
+* We will be using Amplify Cli , and some of the git action during the way.
+
+### Prerequisites:
+
+* Have a Panorama device and a working Camera ( Data resource )  connected to your [Panorama Console](https://aws.amazon.com/panorama/)
+* **Install amplify cli** and **Configure Amplify** by following the instructions on https://docs.amplify.aws/cli/start/install/
+    * [Install Node.js®](https://nodejs.org/en/download/) and [NPM](https://www.npmjs.com/get-npm) if they are not already on your machine.
+* Install **git** by following the instructions on **** [**https://github.com/git-guides/install-git**](https://github.com/git-guides/install-git)
+
+### Install:
+
+Install the PPE project by cloning the repository to your local machine
+
+```
+git clone [https://github.com/hardco2020/amplify-oneClick.git](https://github.com/hardco2020/aws-ppe-test1.git)
+```
+
+Heading to the root of the repository 
+
+```
+cd <your-repo-path>
+```
+
+
+
+### **Amplify configure**
+
+Create an amplify IAM user for your account, type **amplify configure** in your terminal
+
+```
+amplify configure
+```
+
+It will automatically login to your AWS console if you already login. Back to the terminal and press enter
+
+It will ask you to select region, please select ap-southeast-1 and fill in the user name you like 
+
+Press Enter to continue
+
+
+```
+Specify the AWS Region
+? region: ap-southeast-1
+Specify the username of the new IAM user:
+? user name: Amplify-Final-User
+Complete the user creation using the AWS console
+https://console.aws.amazon.com/iam/home?region=ap-southeast-1#/users$new?step=final&accessKey&userNames=Amplify-Final-User&permissionType=policies&policies=arn:aws:iam::aws:policy%2FAdministratorAccess-Amplify
+```
+
+After that it will lead you to create an Amplify IAM user,  **choose create policy** 
+![](https://i.imgur.com/5Wco53a.png)
+
+Choose **JSON**, and **enter the following json inside the field**
+![](https://i.imgur.com/bqvHmZq.png)
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:*",
+                "codebuild:*",
+                "states:*",
+                "iot:*",
+                "s3:*",
+                "dynamodb:*",
+                "lambda:*",
+                "sagemaker:*",
+                "panorama:*",
+                "ecs:*",
+                "ec2:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateInstanceProfile",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:AddRoleToInstanceProfile",
+                "iam:PassRole",
+                "iam:DeleteInstanceProfile",
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:RemoveRoleFromInstanceProfile"
+            ],
+            "Resource": "arn:aws:iam::*:role/amplify*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateInstanceProfile",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:AddRoleToInstanceProfile",
+                "iam:PassRole",
+                "iam:DeleteInstanceProfile",
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:RemoveRoleFromInstanceProfile"
+            ],
+            "Resource": "arn:aws:iam::*:instance-profile/amplify*"
+        }
+    ]
+}
+```
+
+Give the policy a random name, and attach it to the previous user you create 
+<img width="795" alt="Screen Shot 2022-08-26 at 10 48 57 AM" src="https://user-images.githubusercontent.com/61721490/186806023-29fc5c67-af84-4950-bda4-9149b84d801a.png">
+
+After that you will see an access key and the secret key like  below, **please don’t close the window yet** 
+
+<img width="797" alt="Screen Shot 2022-08-26 at 10 50 03 AM" src="https://user-images.githubusercontent.com/61721490/186806076-93e88b53-0780-4d2e-aa32-cbc6a11e3164.png">
+
+
+
+Then you can back to the terminal, and **press Enter to continue, then you will see the request to enter Access Key ID and Secret Key, Copy the key you just create in last step.**
+
+```
+Enter the access key of the newly created user:
+? accessKeyId:  ********************
+? secretAccessKey:  ****************************************
+```
+
+Enter a profile name you prefer, it will create a profile for your amplify cli
+
+```
+? Profile Name: finalTest
+This would update/create the AWS Profile in your local machine
+```
+
+If you see the following message, congrats on finishing the amplify configure
+
+```
+Successfully set up the new user.
+```
+
+
+
+## Deploying
+
+**Init the amplify**, and the system will ask if you want to use an existing environment, **select no**
+
+```
+amplify init
+
+Note: It is recommended to run this command from the root of your app directory
+? Do you want to use an existing environment? No
+```
+
+
+Enter a desired env name, remember this name, as it will be used for the later, **please name it other than  “dev”**
+
+```
+? Enter a name for the environment
+```
+
+
+Choose the **AWS Profile**
+
+```
+? Select the authentication method you want to use: (Use arrow keys)
+Amplify Studio
+❯ AWS profile
+AWS access keys
+```
+
+Choose the one correspond to the IAM User you just create in **Configure Amplify**
+
+```
+? Please choose the profile you want to use (Use arrow keys)
+plugins
+codeartifact
+default
+test
+❯ finalTest
+```
+
+It will initialize the resource on the cloud for you, if you go to your AWS Amplify Console, you can see the resource is created 
+<img width="790" alt="Screen Shot 2022-08-26 at 10 50 52 AM" src="https://user-images.githubusercontent.com/61721490/186806171-5a910c06-104c-4bf5-8e2d-32a1cf82e62a.png">
+
+
+Move to the custom resource
+
+```
+amplify/backend/custom/customResource291b215b/customResource291b215b-cloudformation-template.yaml
+```
+
+Replace the env Default name with your environment name.
+
+```
+env:
+    Type: String
+    Default: <Your own env name>
+    Description: Please input your amplify env name !!!
+```
+
+<img width="790" alt="Screen Shot 2022-08-26 at 10 54 17 AM" src="https://user-images.githubusercontent.com/61721490/186806514-b3d74c13-96e9-4956-aea1-fe764d2c5c96.png">
+
+Build the APP and Publish the whole stack to your backend 
+
+```
+npm install  // Build the Front-end app on the local environment
+amplify publish  // Push the build Front-end app and your Back-end service to the Cloud
+```
+
+<img width="795" alt="Screen Shot 2022-08-26 at 10 56 52 AM" src="https://user-images.githubusercontent.com/61721490/186807827-36235872-cd48-4f27-bd9a-94cd9fdbe7dc.png">
+
+Click into the website URL which shows at the end, your website will be deployed on the 
+
+
+
+```
+https://cra.link/deployment
+The project was built assuming it is hosted at /.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+npm install -g serve
+serve -s build
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+
+✔ Zipping artifacts completed.
+✔ Deployment complete!
+
+https://dev.d2bo2woks3a1xn.amplifyapp.com
+```
+
+
+After you successfully see your website, please **go to the AWS Amplify Console** and do one last setting. select your App, and select **Rewrite and redirects**
+
+<img width="800" alt="Screen Shot 2022-08-26 at 10 58 53 AM" src="https://user-images.githubusercontent.com/61721490/186808299-74452777-ad0a-46e4-b90e-fcd9ce3dc2a6.png">
+
+
+**Add Rewrites and redirects**
+
+<img width="795" alt="Screen Shot 2022-08-26 at 11 00 02 AM" src="https://user-images.githubusercontent.com/61721490/186808400-9c4c8f92-d164-4c1e-b59f-de832b063db0.png">
+
+Add the following text to each role like the pic below 
+
+`</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json|webp)$)([^.]+$)/>`
+
+`/index.html`
+
+`200`
+
+<img width="797" alt="Screen Shot 2022-08-26 at 11 01 01 AM" src="https://user-images.githubusercontent.com/61721490/186808508-0309a2db-288d-4d8a-901d-563640909366.png">
+
+### **Congrats, you are done with the one click installation !!** 
+
 ## Prerequisites:
 
 - Have a Panorama device and a working Camera ( Data resource ) connected to your [Panorama Console](https://aws.amazon.com/panorama/)
