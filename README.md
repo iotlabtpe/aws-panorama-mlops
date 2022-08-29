@@ -1,4 +1,4 @@
-# PPE Amplify One Click Installation 
+# Panorama MLOps Installation
 
 ## Note:
 
@@ -24,14 +24,14 @@ Next, you can head to the [Amplify Console](https://ap-southeast-1.console.aws.a
 ![](https://i.imgur.com/2CCl4uM.png)
 
 
-Grant access to your AWS account using you Github, and choose **amplify-oneClick** on Branch **prod**
+Grant access to your AWS account using you Github, and choose **aws-panorama-mlops** on Branch **prod**
 
 ![Screen Shot 2022-08-29 at 9 48 34 AM](https://user-images.githubusercontent.com/61721490/187107270-80101b20-bbaf-4ea4-b982-d26932368b24.png)
 
 
 Fill in the name you want and the environment name you like, after that you have to **create a new role**
 
-![](https://i.imgur.com/Np5kAwy.png)
+![Screen Shot 2022-08-29 at 1 34 06 PM](https://user-images.githubusercontent.com/61721490/187129927-b34ce108-09c2-4018-81df-ae46516204a4.png)
 
 During creating a new role, you can just click next until the Create Role is completed, here are the example pictures
 
@@ -176,7 +176,7 @@ Set the **Build timeout to be 60 minutes**
 
 <img width="1749" alt="Screen Shot 2022-08-24 at 2 12 37 PM" src="https://user-images.githubusercontent.com/61721490/186344017-31736dec-e491-4cce-a383-294305263bd3.png">
 
-Go back to the Buliding Graph by click on your App name ( default is amplify-oneClick ) on the left menu 
+Go back to the Buliding Graph by click on your App name ( default is aws-panorama-mlops ) on the left menu 
 
 Because when we first deploy the APP, it will use the 30 minutes build time out setting for our deployment, we will need to redeploy so the APP will follow our new settings
 
@@ -195,6 +195,25 @@ You can click on the **Domain URL** to see your own PPE below!!!
 <img width="1789" alt="Screen Shot 2022-08-24 at 2 17 23 PM" src="https://user-images.githubusercontent.com/61721490/186344780-2f66fbdb-0946-4ec4-be53-cff7c2e5130b.png">
 
 
+## Wrap up ## 
+
+When we are deploying, we use EC2 to push our model to the ECR, after that we can manually turn off the EC2 to **save the cost**
+
+Go to [AWS EC2 Console](https://ap-southeast-1.console.aws.amazon.com/ec2/v2/home?region=ap-southeast-1#Home:)
+
+![Screen Shot 2022-08-29 at 1 40 57 PM](https://user-images.githubusercontent.com/61721490/187130697-9fd4dbe4-0e15-4324-bcdd-ced23bc974eb.png)
+
+Choose the **Instances(Running)**, you will see a instance without name ( there will be multiple if you deploy more than one Panorama MLOps environment )
+
+![Screen Shot 2022-08-29 at 1 43 59 PM](https://user-images.githubusercontent.com/61721490/187130967-da9c2155-1f3a-4b1a-887e-89f7166dc7db.png)
+
+Choose the Instance, and select the **Instance State**, then click on **Terminate Instance**
+
+![Screen Shot 2022-08-29 at 1 44 50 PM](https://user-images.githubusercontent.com/61721490/187131183-c8b8d704-6702-40d8-8810-4072389ca1f4.png)
+
+Congrats! You just save some money !!
+
+
 ## How to use the PPE with Panorama
 
 The following will teach you how to deploy **a Human Detector APP on Panorama and monitor the results using PPE** 
@@ -211,7 +230,8 @@ Click on **New training, and just click on Submit,** we don’t have to input an
 
 
 After that you will **see a field with training icon in your application, it means the training begin**, you can do other steps and come back after the training finished 
-[Image: Image.jpg]
+
+![Screen Shot 2022-08-29 at 1 37 15 PM](https://user-images.githubusercontent.com/61721490/187130256-d8e42f11-1027-4ba8-9d7a-c9c6beacd18e.png)
 
 The training has two phase, the first phase is to output a model to your **retrain bucket** which shows below 
 
@@ -264,6 +284,7 @@ After complete all the field, you can click on **Submit**
 After that, you can see your application status at **Deployed Application** or you can go to [Panorama Console](https://ap-southeast-1.console.aws.amazon.com/panorama/home?region=ap-southeast-1#), and click on **Deployed applications,** you will  see your APP is being deployed, please wait for 30-60 minutes, then see your **Application is running with green light,** you can go to next step
 
 <img width="1772" alt="Screen Shot 2022-08-24 at 2 35 42 PM" src="https://user-images.githubusercontent.com/61721490/186347696-881c6172-c622-4a4e-9235-18adc4954d92.png">
+
 
 
 ## **Use the Panorama Application with PPE**
