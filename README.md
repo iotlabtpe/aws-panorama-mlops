@@ -16,16 +16,18 @@
 ## Fork Repo to your Git
 
 heading to our [git repo](https://github.com/hardco2020/aws-panorama-mlops), and fork the repo to your account
-![](https://i.imgur.com/6hZ53EG.png)
+
+![Screen Shot 2022-08-29 at 9 50 01 AM](https://user-images.githubusercontent.com/61721490/187107375-1668c1df-8073-4bae-82aa-ef7d2fa88abc.png)
 
 Next, you can head to the [Amplify Console](https://ap-southeast-1.console.aws.amazon.com/amplify/home?region=ap-southeast-1#/) , choose **Hosting my Web APP and GitHub as your existing code**
 
 ![](https://i.imgur.com/2CCl4uM.png)
 
 
-Grant access to your AWS account using you Github, and choose **amplify-oneClick** on Branch **main**
+Grant access to your AWS account using you Github, and choose **amplify-oneClick** on Branch **prod**
 
-![](https://i.imgur.com/TuEeASY.png)
+![Screen Shot 2022-08-29 at 9 48 34 AM](https://user-images.githubusercontent.com/61721490/187107270-80101b20-bbaf-4ea4-b982-d26932368b24.png)
+
 
 Fill in the name you want and the environment name you like, after that you have to **create a new role**
 
