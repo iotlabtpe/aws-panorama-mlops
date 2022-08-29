@@ -2,9 +2,7 @@ import boto3
 import os
 
 
-env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])[
-    "Parameter"
-]["Value"]
+env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])["Parameter"]["Value"]
 random_p = boto3.client("ssm").get_parameter(Name="/ppe/random/" + os.environ["ENV"])
 
 S3_NAME = "app-graph-" + random_p["Parameter"]["Value"]
@@ -24,12 +22,10 @@ def handler(event, context):
             "value": event["otherInput"]["model_name"],
             "type": "PLAINTEXT",
         },
-        {"name": "DB_TABLE_NAME", "value": "ppaModel-" + env_p, "type": "PLAINTEXT"},
+        {"name": "DB_TABLE_NAME", "value": "Model-" + env_p, "type": "PLAINTEXT"},
         {
             "name": "GRAPH_S3",
-            "value": "s3://"
-            + S3_NAME
-            + "/graph/{}/graph.json".format(event["otherInput"]["model_name"]),
+            "value": "s3://" + S3_NAME + "/graph/{}/graph.json".format(event["otherInput"]["model_name"]),
             "type": "PLAINTEXT",
         },
     ]
