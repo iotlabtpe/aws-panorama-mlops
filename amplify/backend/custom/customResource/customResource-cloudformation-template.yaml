@@ -302,10 +302,6 @@ Resources:
                 /home/ec2-user/ppe/
               - |
                 cd script
-              - |
-                bash matlab_pull_and_push.sh ap-southeast-1
-              - |
-                bash yolov5_pull_and_push.sh ap-southeast-1
               - aws s3 cp training-input/ s3://
               - Ref: S3BucketModelPretrainCreation
               - |
