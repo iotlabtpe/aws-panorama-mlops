@@ -4,9 +4,7 @@ from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 import os
 
-env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])[
-    "Parameter"
-]["Value"]
+env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])["Parameter"]["Value"]
 # DB
 TABLE_NAME = "Event-" + env_p
 db = boto3.resource("dynamodb")
@@ -28,10 +26,7 @@ def handler(event, context):
     try:
         if event["httpMethod"] == "GET":
             response = table.query(
-                Limit=10,
-                KeyConditionExpression=Key("CameraID").eq(
-                    "demo-camera-1.0-a07451ac-demo-camera"
-                ),
+                KeyConditionExpression=Key("CameraID").eq("demo-camera-1.0-a07451ac-demo-camera"),
                 ScanIndexForward=False,
             )
             results = []
@@ -71,9 +66,7 @@ def handler(event, context):
                             new_box.append(str(line))
                         box_group.append(new_box)
                     good["ack_bbox_mask"] = box_group
-                good["origin_picture"] = get_presigned_url(
-                    item["payload"]["origin_picture"]
-                )
+                good["origin_picture"] = get_presigned_url(item["payload"]["origin_picture"])
 
                 results.append(good)
             body = json.dumps(results)
@@ -137,8 +130,6 @@ def get_presigned_url(s3uri):
         )
         print("Got presigned URL: {}".format(url))
     except ClientError:
-        print(
-            "Couldn't get a presigned URL for client method {}.".format(client_method)
-        )
+        print("Couldn't get a presigned URL for client method {}.".format(client_method))
         raise
     return url
