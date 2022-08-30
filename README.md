@@ -194,26 +194,6 @@ You can click on the **Domain URL** to see your own PPE below!!!
 
 <img width="1789" alt="Screen Shot 2022-08-24 at 2 17 23 PM" src="https://user-images.githubusercontent.com/61721490/186344780-2f66fbdb-0946-4ec4-be53-cff7c2e5130b.png">
 
-
-## Wrap up ## 
-
-When we are deploying, we use EC2 to push our model to the ECR, after that we can manually turn off the EC2 to **save the cost**
-
-Go to [AWS EC2 Console](https://ap-southeast-1.console.aws.amazon.com/ec2/v2/home?region=ap-southeast-1#Home:)
-
-![Screen Shot 2022-08-29 at 1 40 57 PM](https://user-images.githubusercontent.com/61721490/187130697-9fd4dbe4-0e15-4324-bcdd-ced23bc974eb.png)
-
-Choose the **Instances(Running)**, you will see a instance without name ( there will be multiple if you deploy more than one Panorama MLOps environment )
-
-![Screen Shot 2022-08-29 at 1 43 59 PM](https://user-images.githubusercontent.com/61721490/187130967-da9c2155-1f3a-4b1a-887e-89f7166dc7db.png)
-
-Choose the Instance, and select the **Instance State**, then click on **Terminate Instance**
-
-![Screen Shot 2022-08-29 at 1 44 50 PM](https://user-images.githubusercontent.com/61721490/187131183-c8b8d704-6702-40d8-8810-4072389ca1f4.png)
-
-Congrats! You just save some money !!
-
-
 ## How to use the PPE with Panorama
 
 The following will teach you how to deploy **a Human Detector APP on Panorama and monitor the results using PPE** 
@@ -365,7 +345,38 @@ There are three ways to delete PPE, you will need to combine two of them to dele
 3. On the **App** page, select the **Actions** dropdown list. Then, choose **Delete app**.
 
 
-**After that, if you still see your APP in the Amplify Console, you will need to use AWS CLI to completely delete the APP**
+**After that, if you still see your APP in the Amplify Console, you will need to use AWS CLI and CloudFormation to completely delete the APP**
+
+### Using CloudFormation 
+
+Go to [AWS CloudForamtion Console](https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks?filteringStatus=active&filteringText=&viewNested=false&hideStacks=false&stackId=), if you see a lot of stack, uncheck **view Nested** then you will see the following.
+
+<img width="1492" alt="Screen Shot 2022-08-30 at 8 02 34 PM" src="https://user-images.githubusercontent.com/61721490/187431895-fa375a61-7e64-4d99-838f-5b367ddce37f.png">
+
+Choose the one with the environment name you just created, default will be **prodline**, click on Delete. 
+
+After that you will see the **Delete failed**, choose **view nested**
+
+You can see there's one nested stack which also fail to delete, 
+
+<img width="1468" alt="Screen Shot 2022-08-30 at 8 08 25 PM" src="https://user-images.githubusercontent.com/61721490/187432853-ee9e5b85-ebcf-4cb0-948b-8d9deb297b53.png">
+
+Click on the nested stack with **custom resource** and **Delete** again, you will see the following 
+
+<img width="1301" alt="Screen Shot 2022-08-30 at 8 15 39 PM" src="https://user-images.githubusercontent.com/61721490/187434162-8cc68879-a6a8-44aa-8cf7-5bf0e103b077.png">
+
+You can have two choices, one is click on the resource, and **go to the resource to delete the s3 bucket**, or select the resource to **retain the resource** and delete again like the following pic 
+
+<img width="1003" alt="Screen Shot 2022-08-30 at 8 24 17 PM" src="https://user-images.githubusercontent.com/61721490/187435788-908a09d8-6a93-4389-a0b1-51a161730e55.png">
+
+once you do that you will be able to delete the **custom resource** nested stack, then you can delete the stack again.
+
+<img width="1696" alt="Screen Shot 2022-08-30 at 8 35 40 PM" src="https://user-images.githubusercontent.com/61721490/187438120-4d80ee8e-c5f2-42eb-a126-2c4cfffeddc5.png">
+
+This time you don't have to click on **retain custom resource** since we already delete the resource on last step, so just delete 
+
+After that you can move on to **Using AWS CLI to completely delete the resource** 
+
 
 ### Using AWS CLI
 
