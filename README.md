@@ -69,7 +69,7 @@ Choose **JSON** and paste the following JSON into the rule like the picture belo
                 "lambda:*",
                 "sagemaker:*",
                 "panorama:*",
-                "ecs:*",
+                "ecr:*",
                 "ec2:*"
             ],
             "Resource": "*"
