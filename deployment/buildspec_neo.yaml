@@ -1,0 +1,52 @@
+version: 0.2
+
+phases:
+  install:
+    commands: # installing panorama cli
+      - echo $TASK_TOKEN
+      - aws --version
+      - pip3 install boto3 # not sure if necessary
+      - pip3 install panoramacli
+  pre_build:
+    commands:
+      - echo Nothing to do in the pre_build phase...
+  build:
+    commands: # TODO: download from S3 and upload to S3, rmb to grant S3 access to IAM.
+      - cd deployment/people_counter/people_counter_app
+      - echo $DB_TABLE_NAME
+      - echo $MODEL_NAME
+      - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - panorama-cli import-application
+      - export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - export APP_NAME='people_counter_app'
+      - export CODE_PACKAGE_NAME='PEOPLE_COUNTER_CODE'
+      - export MODEL_PACKAGE_NAME='SSD_MODEL'
+      - wget https://panorama-starter-kit.s3.amazonaws.com/public/v2/Models/ssd_512_resnet50_v1_voc.tar.gz -O ssd_512_resnet50_v1_voc.tar.gz
+      - panorama-cli add-raw-model --model-asset-name model_asset --model-local-path ./ssd_512_resnet50_v1_voc.tar.gz --descriptor-path packages/$ACCOUNT_ID-$MODEL_PACKAGE_NAME-1.0/descriptor.json  --packages-path packages/$ACCOUNT_ID-$MODEL_PACKAGE_NAME-1.0
+      - panorama-cli build --container-asset-name code_asset --package-path packages/$ACCOUNT_ID-$CODE_PACKAGE_NAME-1.0
+      - panorama-cli package-application
+      - aws s3 cp graphs/people_counter_app/graph.json $GRAPH_S3
+      - >
+        aws dynamodb update-item \
+          --table-name $DB_TABLE_NAME \
+          --key '{
+            "model_name": {"S": "'$MODEL_NAME'"}
+          }' \
+          --update-expression 'SET #url = :url' \
+          --expression-attribute-names '{
+            "#url": "trainingJobModelDataUrl"
+          }' \
+          --expression-attribute-values '{
+            ":url": {"S": "'$GRAPH_S3'"}
+          }'
+      - aws stepfunctions send-task-success --task-token $TASK_TOKEN --task-output {}
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - find ./ | grep json | grep graph
+      - pwd
+      # - aws stepfunctions send-task-failure --task-token $TASK_TOKEN 
+artifacts:
+  files:
+  - ppe_panorama_app/graphs/ppe_panorama_app/graph.json
+  
