@@ -33,24 +33,24 @@ fi
 fullname_src="${src_id}.dkr.ecr.${src_region}.${aws_endpoint}/${image}:latest"
 fullname_dst="${dst_id}.dkr.ecr.${dst_region}.${aws_endpoint}/${image}:latest"
 
-# If the repository doesn't exist in ECR, create it.
-aws ecr describe-repositories --repository-names "${image}" --region ${dst_region} || aws ecr create-repository --repository-name "${image}" --region ${dst_region}
+# If the repository doesn't exist in ECR, 
+aws ecr describe-repositories --repository-names "${image}" --region ${dst_region} 
 
-if [ $? -ne 0 ]
+if [ $? -ne 0 ] # if recent command not equal to success, mean we don't have ecr in the account
 then
     echo '123'
     aws ecr create-repository --repository-name "${image}" --region ${dst_region}
+    aws ecr get-login-password --region ${dst_region} | sudo docker login --username AWS --password-stdin ${dst_id}.dkr.ecr.${dst_region}.${aws_endpoint}
+    aws ecr get-login-password --region ${src_region} | sudo docker login --username AWS --password-stdin ${src_id}.dkr.ecr.${src_region}.${aws_endpoint}
+
+    aws ecr set-repository-policy \
+        --repository-name "${image}" \
+        --policy-text "file://ecr-policy.json" \
+        --region ${dst_region}
+
+    # Pull the docker image, tag with full name and then push it to ECR
+    sudo docker pull ${fullname_src}
+    sudo docker tag ${fullname_src} ${fullname_dst}
+    sudo docker push ${fullname_dst}
 fi
 
-aws ecr get-login-password --region ${dst_region} | sudo docker login --username AWS --password-stdin ${dst_id}.dkr.ecr.${dst_region}.${aws_endpoint}
-aws ecr get-login-password --region ${src_region} | sudo docker login --username AWS --password-stdin ${src_id}.dkr.ecr.${src_region}.${aws_endpoint}
-
-aws ecr set-repository-policy \
-    --repository-name "${image}" \
-    --policy-text "file://ecr-policy.json" \
-    --region ${dst_region}
-
-# Pull the docker image, tag with full name and then push it to ECR
-sudo docker pull ${fullname_src}
-sudo docker tag ${fullname_src} ${fullname_dst}
-sudo docker push ${fullname_dst}
