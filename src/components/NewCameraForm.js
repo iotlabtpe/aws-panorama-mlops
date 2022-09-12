@@ -31,9 +31,13 @@ class  NewCameraForm extends React.Component {
     this.state = {
       streamUrl:'rtsp://1.1.1.1/',
       description:'lobby camera1',
-      username:'',
-      cameraName:'',
-      password:'',
+      username:'admin',
+      cameraName:'camera1',
+      password:'12345',
+      errorUserName: false,
+      errorCameraName: false,
+      errorPassword: false,
+      errorStreamUrl: false,
       visible:false,
       post_result:'',
     }
@@ -81,7 +85,43 @@ class  NewCameraForm extends React.Component {
   }
 
   handelInputChange(e,key){
+    if(key === 'streamUrl'){
+      if(/\s/g.test(e) === true || e === ""){
+        this.setState({ errorStreamUrl : true})
+      }
+      else{
+        this.setState({ errorStreamUrl : false})
+      }
+    }
+    else if( key === 'username'){
+      if(/\s/g.test(e) === true || e === "" ){
+        this.setState({ errorUserName : true})
+      }
+      else{
+        this.setState({ errorUserName : false})
+      }
+
+    }
+    else if( key === 'password'){
+      if(/\s/g.test(e) === true || e === ""){
+        this.setState({ errorPassword : true})
+      }
+      else{
+        this.setState({ errorPassword : false})
+      }
+
+    }
+    else if ( key === 'cameraName'){
+      if(/\s/g.test(e) === true || e === ""){
+        this.setState({ errorCameraName : true})
+      }
+      else{
+        this.setState({ errorCameraName : false})
+      }
+
+    }
     this.setState({[key]:e})
+
   }
 
   handleTextChange(e,key){
@@ -98,18 +138,18 @@ class  NewCameraForm extends React.Component {
             actions={
                 <div>
                     {/* <Button variant="link">Cancel</Button> */}
-                    <Button variant="primary" onClick={() => this.submit()}  >Submit</Button>
+                    <Button variant="primary" onClick={() => this.submit()}  disabled={this.state.errorCameraName || this.state.errorPassword || this.state.errorStreamUrl || this.state.errorUserName ? true : false }  >Submit</Button>
                 </div>
             }
             onSubmit={console.log}
         >
             <FormSection header={t("New Camera Config")}>
 
-                <FormField label="Camera Name" controlId="formFieldId1">
+                <FormField label="Camera Name" controlId="formFieldId1" errorText={ this.state.errorCameraName ? 'Your input is not correct' : undefined  }>
                     <Input type="text" controlId="cameraName" value={this.state.cameraName} onChange={(e)=> this.handelInputChange(e,'cameraName')}  />
                 </FormField>
 
-                <FormField label="Stream Url" controlId="formFieldId2">
+                <FormField label="Stream Url" controlId="formFieldId2" errorText={ this.state.errorStreamUrl ? 'Your input is not correct' : undefined  } >
                     <Input type="text" controlId="streamUrl" value={this.state.streamUrl} onChange={(e)=> this.handelInputChange(e,'streamUrl')}  />
                 </FormField>
 
@@ -117,11 +157,11 @@ class  NewCameraForm extends React.Component {
                   <Textarea classname="LabelText" rows="10"  readonly={false} value={this.state.description} onChange={(e)=>this.handleTextChange(e,'description')}> </Textarea> 
                 </FormField>
 
-                <FormField label="Username" controlId="formFieldId4">
+                <FormField label="Username" controlId="formFieldId4" errorText={ this.state.errorUserName ? 'Your input is not correct' : undefined  } >
                     <Input type="text" controlId="username" value={this.state.username} onChange={(e)=> this.handelInputChange(e,'username')}  />
                 </FormField>
 
-                <FormField label="Password" controlId="formFieldId5">
+                <FormField label="Password" controlId="formFieldId5" errorText={ this.state.errorPassword ? 'Your input is not correct' : undefined  }>
                     <Input type="text" controlId="password" value={this.state.password} onChange={(e)=> this.handelInputChange(e,'password')}  />
                 </FormField>
             </FormSection>

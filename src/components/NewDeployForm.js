@@ -45,7 +45,10 @@ class NewDeployForm extends React.Component {
       Chose_Device_UUID: "device-ylaq25peslngbrowu2bmlqxp24",
 
       targetArn: 's3://app-graph-4c1bb430-172b-11ed-b380-0647bab7fb5a/graph/ppa-2022-08-08-16-00-25/graph.json',
-      deploymentName: 'Deployment APP',
+      deploymentName: 'Deployment-APP',
+
+      errorDeploymentName: false,
+      errorS3Uri: false,
       visible: false,
       post_result: '',
     }
@@ -163,6 +166,27 @@ class NewDeployForm extends React.Component {
   }
 
   handelInputChange(e, key) {
+  
+    if(key === 'targetArn'){
+      console.log('true')
+      if(/\s/g.test(e) === true || e === ""){
+        console.log('have space')
+        this.setState({ errorS3Uri : true})
+      }
+      else{
+        this.setState({ errorS3Uri : false})
+      }
+    }
+    if(key === 'deploymentName'){
+      console.log('true')
+      if(/\s/g.test(e) === true || e === "" ){
+        console.log('have space')
+        this.setState({ errorDeploymentName : true})
+      }
+      else{
+        this.setState({ errorDeploymentName : false})
+      }
+    }
     this.setState({ [key]: e })
   }
 
@@ -204,14 +228,14 @@ class NewDeployForm extends React.Component {
           actions={
             <div>
               {/* <Button variant="link">Cancel</Button> */}
-              <Button variant="primary" onClick={() => this.submit()}  >Submit</Button>
+              <Button variant="primary" onClick={() => this.submit()} disabled={this.state.errorDeploymentName || this.state.errorS3Uri ? true : false }  >Submit</Button>
             </div>
           }
           onSubmit={(e) => this.handleDeploy(e)}
         >
           <FormSection header={t("New Deployment")}>
 
-            <FormField label="APP Name" controlId="formFieldId6">
+            <FormField label="APP Name" controlId="formFieldId6" errorText={ this.state.errorDeploymentName ? 'Your input is not correct' : undefined  } >
               <Input type="text" controlId="input_dn" value={this.state.deploymentName} onChange={(e) => this.handelInputChange(e, 'deploymentName')} />
             </FormField>
 
@@ -241,7 +265,7 @@ class NewDeployForm extends React.Component {
               {/* <Text>{this.state.Chose_Camera_Name}</Text> */}
             </FormField>
 
-            <FormField label="Graph.json Target S3 Position" controlId="formFieldId5">
+            <FormField label="Graph.json Target S3 Position" controlId="formFieldId5" errorText={ this.state.errorS3Uri ? 'Your input is not correct' : undefined  } >
               <Input type="text" controlId="input_targetArn" value={this.state.targetArn} onChange={(e) => this.handelInputChange(e, 'targetArn')} />
             </FormField>
 

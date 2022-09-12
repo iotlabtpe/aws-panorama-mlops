@@ -30,11 +30,12 @@ class  NewStoredApplicationForm extends React.Component {
     super(props);
     this.state = {
         uploadMethod: "",
-        s3Uri: "",
+        s3Uri: "s3://",
         options:[
             {label: "uri", value:"uri" },
             {label:"file",value:"file"}
-        ]
+        ],
+        errorS3Uri: false
     }
   }
 
@@ -73,6 +74,13 @@ class  NewStoredApplicationForm extends React.Component {
   }
 
   handelInputChange(e,key){
+    if(/\s/g.test(e) === true || e === ""){
+      console.log('have space')
+      this.setState({ errorS3Uri : true})
+    }
+    else{
+      this.setState({ errorS3Uri : false})
+    }
     this.setState({[key]:e})
   }
 
@@ -90,7 +98,7 @@ class  NewStoredApplicationForm extends React.Component {
         <Form
             actions={
                 <div>
-                    <Button variant="primary" onClick={() => this.submit()}  >Submit</Button>
+                    <Button variant="primary" onClick={() => this.submit()} disabled={ this.state.errorS3Uri ? true : false }   >Submit</Button>
                 </div>
             }
             onSubmit={console.log}
@@ -105,7 +113,7 @@ class  NewStoredApplicationForm extends React.Component {
                     />
                 </FormField>
 
-                <FormField label="S3 Uri" controlId="formFieldId1">
+                <FormField label="S3 Uri" controlId="formFieldId1" errorText={ this.state.errorS3Uri ? 'Your input is not correct' : undefined  } >
                     <Input type="text" controlId="address" value={this.state.s3Uri} onChange={(e)=> this.handelInputChange(e,'s3Uri')}  />
                 </FormField>
 

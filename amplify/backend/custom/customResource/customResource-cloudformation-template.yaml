@@ -215,151 +215,6 @@ Resources:
               - Effect: Allow
                 Action: iot:*
                 Resource: '*'
-  WebAppSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName:
-        Fn::Join:
-          - '-'
-          - - webapp-security-group
-            - Ref: env
-      GroupDescription: Allow HTTP/HTTPS and SSH inbound and outbound traffic
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 27.0.3.155/32
-  WebAppEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: vpc
-      InstanceId:
-        Ref: BashInstance
-      Tags:
-        - Key: Name
-          Value:
-            Fn::Join:
-              - '-'
-              - - webapp-eip
-                - Ref: env
-  BashInstance:
-    Type: AWS::EC2::Instance
-    CreationPolicy:
-      ResourceSignal:
-        Timeout: PT3H
-    Properties:
-      AvailabilityZone:
-        Fn::Select:
-          - '0'
-          - Fn::GetAZs:
-              Ref: AWS::Region
-      SecurityGroupIds:
-        - Ref: WebAppSecurityGroup
-      KeyName:
-        Ref: BashKey
-      InstanceType: t2.micro
-      ImageId: ami-0c802847a7dd848c0
-      BlockDeviceMappings:
-        - DeviceName: /dev/xvda
-          Ebs:
-            VolumeType: io1
-            Iops: '200'
-            VolumeSize: '30'
-            Encrypted: 'true'
-      IamInstanceProfile:
-        Ref: BashInstanceProfile
-      UserData:
-        Fn::Base64:
-          Fn::Join:
-            - ''
-            - - |
-                #!/bin/bash
-              - |
-                sudo yum update -y
-              - |
-                sudo yum install git -y
-              - |
-                sudo yum install docker -y
-              - |
-                sudo systemctl enable docker
-              - |
-                sudo service docker start
-              - |
-                sudo mkdir /home/ec2-user/ppe
-              - |
-                cd /home/ec2-user/ppe
-              - >
-                sudo git clone
-                https://github.com/hardco2020/aws-panorama-mlops.git
-                /home/ec2-user/ppe/
-              - |
-                cd script
-              - |
-                bash matlab_pull_and_push.sh ap-southeast-1
-              - |
-                bash yolov5_pull_and_push.sh ap-southeast-1
-              - aws s3 cp training-input/ s3://
-              - Ref: S3BucketModelPretrainCreation
-              - |
-                / --recursive
-              - '/opt/aws/bin/cfn-signal -e 0 --stack '
-              - Ref: AWS::StackName
-              - ' --resource BashInstance '
-              - ' --region '
-              - Ref: AWS::Region
-              - |+
-
-  BashInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles:
-        - Ref: BashInstanceRole
-  BashInstanceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - ec2.amazonaws.com
-                - lambda.amazonaws.com
-                - states.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Path: /
-      Policies:
-        - PolicyName: root
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ec2:*
-                  - ecr:*
-                  - ecs:*
-                  - s3:*
-                  - lambda:*
-                  - dynamodb:*
-                  - ssm:*
-                Resource: '*'
-  BashKey:
-    Type: AWS::EC2::KeyPair
-    Properties:
-      KeyName:
-        Fn::Join:
-          - '-'
-          - - BashKey
-            - Ref: env
   StateMachineRole:
     Type: AWS::IAM::Role
     Properties:
@@ -417,29 +272,8 @@ Resources:
                   - lambda:*
                   - dynamodb:*
                   - ssm:*
+                  - codebuild:*
                 Resource: '*'
-  MetricPictrueLambda:
-    Type: AWS::Lambda::Function
-    Properties:
-      Code:
-        ImageUri:
-          Fn::Join:
-            - ''
-            - - Ref: AWS::AccountId
-              - >-
-                .dkr.ecr.ap-southeast-1.amazonaws.com/python39-matplotlib-lambda:latest
-      PackageType: Image
-      FunctionName:
-        Fn::Join:
-          - '-'
-          - - metricToPicture
-            - Ref: env
-      Role:
-        Fn::GetAtt:
-          - LambdaRole
-          - Arn
-      Timeout: 300
-    DependsOn: BashInstance
   CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
@@ -495,8 +329,116 @@ Resources:
         PrivilegedMode: 'true'
       Source:
         BuildSpec: deployment/buildspec.yaml
-        Location: https://github.com/hardco2020/aws-panorama-mlops.git 
+        Location: https://github.com/hardco2020/aws-panorama-mlops.git
         Type: GITHUB
+  PreinstalledPanoramaModel:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name:
+        Fn::Join:
+          - '-'
+          - - Preinstalled-Panorama-Model
+            - Ref: env
+      Description: Preinstall the model fro Panorama Packaging Application
+      ServiceRole:
+        Fn::GetAtt:
+          - CodeBuildRole
+          - Arn
+      Artifacts:
+        Type: no_artifacts
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_LARGE
+        Image: aws/codebuild/standard:5.0
+        PrivilegedMode: 'true'
+      Source:
+        BuildSpec: script/buildspec.yaml
+        Location: https://github.com/hardco2020/aws-panorama-mlops.git
+        Type: GITHUB
+  PreInstalledModelLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.9
+      Handler: index.handler
+      FunctionName:
+        Fn::Join:
+          - '-'
+          - - preinstallModel
+            - Ref: env
+      Environment:
+        Variables:
+          ENV:
+            Ref: env
+          REGION:
+            Ref: AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          import boto3 
+          import cfnresponse
+          import os
+
+          def handler(event, context):
+            try:
+              random_p = boto3.client("ssm").get_parameter(Name="/ppe/random/" + os.environ["ENV"])["Parameter"]["Value"]
+              if event['RequestType'] == "Create":
+                codeBuild_client = boto3.client("codebuild")
+                env_var = [
+                    {
+                      "name":"PRETRAIN_BUCKET",
+                      "value": "s3://pretraininput-" + random_p,
+                    },
+                    {
+                      "name":"REGION"
+                      "value": os.environ["REGION"]
+                    }
+                ]
+                build = codeBuild_client.start_build(
+                    projectName="Preinstalled-Panorama-Model-" + os.environ["ENV"],
+                    environmentVariablesOverride=env_var,
+                )
+                build_id = build["build"]["id"]
+                responseValue = 120
+                responseData = {}
+                responseData['Data'] = responseValue
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, 
+                  responseData, 'scm-cfn-customresource-id')
+                return {
+                    "statusCode": 200,
+                    "build_id": build_id,
+                }
+              elif event['RequestType'] == 'Delete':
+                s3_client = boto3.resource('s3')
+                pretrain = s3_client.Bucket('pretraininput-' + random_p)
+                pretrain.object_versions.delete()
+                
+                retrain = s3_client.Bucket('retrainoutput-' + random_p)
+                retrain.object_versions.delete()
+                
+                panoramaApp = s3_client.Bucket('panorama-app-' + random_p)
+                panoramaApp.object_versions.delete()
+                
+                appGraph = s3_client.Bucket('app-graph-' + random_p)
+                appGraph.object_versions.delete()
+                
+                eventBucket = s3_client.Bucket('event-' + random_p)
+                eventBucket.object_versions.delete()
+                
+                exportEvent = s3_client.Bucket('export-event-' + random_p)
+                exportEvent.object_versions.delete()    
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, 
+                  responseData, 'scm-cfn-customresource-id')     
+            except:
+              responseValue = 120
+              responseData = {}
+              responseData['Data'] = responseValue
+              cfnresponse.send(event, context, cfnresponse.FAILED, 
+                responseData, 'scm-cfn-customresource-id')
+      Role:
+        Fn::GetAtt:
+          - LambdaRole
+          - Arn
+      Timeout: 300
   ModelStateMachine:
     Type: AWS::StepFunctions::StateMachine
     Properties:
@@ -561,7 +503,7 @@ Resources:
                     {
                       "Variable": "$.status",
                       "StringEquals": "Completed",
-                      "Next": "UploadMetricsToS3"
+                      "Next": "InvokeCodeBuild"
                     },
                     {
                       "Variable": "$.status",
@@ -570,50 +512,6 @@ Resources:
                     }
                   ],
                   "Default": "Fail"
-                },
-                "UploadMetricsToS3": {
-                  "Type": "Task",
-                  "Resource": "arn:aws:states:::lambda:invoke",
-                  "OutputPath": "$.Payload",
-                  "Parameters": {
-                    "Payload.$": "$",
-                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:uploadMetricsToS3-${Env}:$LATEST"
-                  },
-                  "Retry": [
-                    {
-                      "ErrorEquals": [
-                        "Lambda.ServiceException",
-                        "Lambda.AWSLambdaException",
-                        "Lambda.SdkClientException"
-                      ],
-                      "IntervalSeconds": 2,
-                      "MaxAttempts": 6,
-                      "BackoffRate": 2
-                    }
-                  ],
-                  "Next": "MetricsToPicture"
-                },
-                "MetricsToPicture": {
-                  "Type": "Task",
-                  "Resource": "arn:aws:states:::lambda:invoke",
-                  "OutputPath": "$.Payload",
-                  "Parameters": {
-                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:metricToPicture-${Env}:$LATEST",
-                    "Payload.$": "$"
-                  },
-                  "Retry": [
-                    {
-                      "ErrorEquals": [
-                        "Lambda.ServiceException",
-                        "Lambda.AWSLambdaException",
-                        "Lambda.SdkClientException"
-                      ],
-                      "IntervalSeconds": 2,
-                      "MaxAttempts": 6,
-                      "BackoffRate": 2
-                    }
-                  ],
-                  "Next": "InvokeCodeBuild"
                 },
                 "InvokeCodeBuild": {
                   "Type": "Task",
@@ -734,3 +632,15 @@ Resources:
             - - SELECT * FROM 'ppe/event/
               - Ref: env
               - ''''
+  InvokePreinstalled:
+    Type: AWS::CloudFormation::CustomResource
+    Version: '1.0'
+    DependsOn:
+      - ModelStateMachine
+      - PreinstalledPanoramaModel
+      - PreInstalledModelLambda
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - PreInstalledModelLambda
+          - Arn

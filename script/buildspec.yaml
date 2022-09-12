@@ -10,11 +10,12 @@ phases:
   build:
     commands: # TODO: download from S3 and upload to S3, rmb to grant S3 access to IAM.
       - echo $PRETRAIN_BUCKET 
+      - echo $REGION
       - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
       - cd script
       - aws s3 cp training-input/ $PRETRAIN_BUCKET --recursive
-      - bash matlab_pull_and_push.sh ap-southeast-1
-      - bash yolov5_pull_and_push.sh ap-southeast-1
+      - bash matlab_pull_and_push.sh $REGION 
+      - bash yolov5_pull_and_push.sh $REGION 
 
   post_build:
     commands:
