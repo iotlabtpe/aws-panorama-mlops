@@ -495,7 +495,7 @@ Resources:
         PrivilegedMode: 'true'
       Source:
         BuildSpec: deployment/buildspec.yaml
-        Location: https://github.com/hardco2020/aws-panorama-mlops.git
+        Location: https://github.com/hardco2020/aws-panorama-mlops.git 
         Type: GITHUB
   ModelStateMachine:
     Type: AWS::StepFunctions::StateMachine
