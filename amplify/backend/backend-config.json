@@ -73,6 +73,16 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "storedApplicationLambda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "preinstallModel": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "auth": {
@@ -106,14 +116,6 @@
       "service": "API Gateway",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "cameraLambda",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
         {
           "category": "function",
           "resourceName": "deviceLambda",
@@ -165,6 +167,22 @@
         {
           "category": "function",
           "resourceName": "listEvent",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "storedApplicationLambda",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "cameraLambda",
           "attributes": [
             "Name",
             "Arn"

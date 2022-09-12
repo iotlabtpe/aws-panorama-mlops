@@ -71,25 +71,13 @@ def handler(event, context):
                 results.append(good)
             body = json.dumps(results)
         elif event["httpMethod"] == "POST":
-            print("1234456")
             print(event["body"])
-            # body = json.loads(event['body'])
-            # print(body)
             table.update_item(
                 Key={"CameraID": body["CameraID"], "TimeStamp": body["TimeStamp"]},
                 UpdateExpression="set payload = :val",
                 ExpressionAttributeValues={":val": body},
                 ReturnValues="UPDATED_NEW",
             )
-            # print(evet['body'])
-            # es.update(
-            #     index=es_index,
-            #     id=doc_id,
-            #     body={
-            #         "doc": json.loads(event['body'])
-            #     },
-            #     doc_type="_doc"
-            # )
             body = json.dumps("Update Successful")
         return {
             "statusCode": 200,
@@ -130,6 +118,6 @@ def get_presigned_url(s3uri):
         )
         print("Got presigned URL: {}".format(url))
     except ClientError:
-        print("Couldn't get a presigned URL for client method {}.".format(client_method))
+        print("Couldn't get a presigned URL for client method ")
         raise
     return url

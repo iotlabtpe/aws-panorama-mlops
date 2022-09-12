@@ -26,8 +26,6 @@ def handler(event, context):
         s3uri = body["s3uri"]
         images_prefix = "images"
         labels_prefix = "labels"
-        print(type)
-        print(s3uri)
 
         response = table.scan(Limit=10)
         items = response["Items"]

@@ -73,5 +73,6 @@ def handler(event, context):
         "model_name": model_name,
         "status": status,
         "model_data_url": model_data_url,
+        "app_name": event['app_name']
     }
     return result

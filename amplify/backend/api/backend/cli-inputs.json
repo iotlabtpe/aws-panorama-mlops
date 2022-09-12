@@ -1,13 +1,6 @@
 {
   "version": 1,
   "paths": {
-    "/camera": {
-      "name": "/camera",
-      "lambdaFunction": "cameraLambda",
-      "permissions": {
-        "setting": "open"
-      }
-    },
     "/device": {
       "name": "/device",
       "lambdaFunction": "deviceLambda",
@@ -53,6 +46,20 @@
     "/event": {
       "name": "/event",
       "lambdaFunction": "listEvent",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/storedApplication": {
+      "name": "/storedApplication",
+      "lambdaFunction": "storedApplicationLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/camera": {
+      "name": "/camera",
+      "lambdaFunction": "cameraLambda",
       "permissions": {
         "setting": "open"
       }

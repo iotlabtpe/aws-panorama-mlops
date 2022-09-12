@@ -12,29 +12,32 @@ def post(event):
     pano_client = boto3.client("panorama")
     body = json.loads(event["body"])
 
-    CAMERA_NAME = body["brand"]
+    CAMERA_NAME = body["cameraName"]
     CAMERA_CREDS = {
-        "Username": body["location"],
-        "Password": body["network"],
-        "StreamUrl": body["address"],
+        "Username": body["username"],
+        "Password": body["password"],
+        "StreamUrl": body["streamUrl"],
     }
 
-    print(body["camera_id"])
-    print(body["address"])
     print(body["description"])
-    print(body["location"])
-    print(body["brand"])
-    print(body["network"])
-    print(body["image_size"])
 
     try:
-        pano_res = pano_client.create_node_from_template_job(
+        pano_client.create_node_from_template_job(
             NodeName=CAMERA_NAME,
             OutputPackageName=CAMERA_NAME,
             OutputPackageVersion="0.1",
             TemplateParameters=CAMERA_CREDS,
             TemplateType="RTSP_CAMERA_STREAM",
         )
+        return {
+            "statusCode":200,
+            "body": json.dumps("Create Successful"),
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+            },
+        }
     except Exception as e:
         eprint("Error !!")
         eprint(e)
@@ -83,7 +86,15 @@ def get(event):
         }
     except Exception as e:
         eprint(e)
-        return {"statusCode": 500, "body": "Error!!"}
+        return {
+            "statusCode": 500,
+            "body": "Error!!",
+            "headers": {
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+            },
+        }
 
 
 def delete(event):

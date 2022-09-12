@@ -144,7 +144,7 @@ def handler(event, context):
                 "modelTag": model_tag,
             }
         )
-        result = {"model_name": model_name}
+        result = {"model_name": model_name, "app_name": event['storedApplication']}
         return result
     except Exception as e:
         # raise e

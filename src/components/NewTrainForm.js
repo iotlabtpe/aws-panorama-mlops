@@ -4,10 +4,10 @@ import Button from 'aws-northstar/components/Button';
 import FormField from 'aws-northstar/components/FormField'
 import FormSection from 'aws-northstar/components/FormSection';
 import Input from 'aws-northstar/components/Input';
+import Select from 'aws-northstar/components/Select';
 
 
 import Modal from 'aws-northstar/components/Modal';
-import axios from 'axios';
 import { API } from 'aws-amplify';
 
 import React from 'react';
@@ -36,6 +36,8 @@ class NewTrainForm extends React.Component {
       // S3OUT:"s3://spot-bot-assets-ap-east-1/mtr/s3/data",
       IMGPREFIX: "images",
       LABELPREFIX: "labels",
+      StoredApplicationOption:[],
+      StoredApplication: "",
       visible: false,
       post_result: '',
     }
@@ -43,12 +45,31 @@ class NewTrainForm extends React.Component {
 
 
   componentDidMount() {
+    this.load_data();
   }
 
   componentWillUnmount() {
 
   }
+  async load_data(){
+    await API.get('backend', '/storedApplication').then(res => {
+      console.log(res)
+      if (res) {
+        let option_data = []
+        res.forEach((item) => {
+          let option = {}
+          option['label'] = item['appName']
+          option['value'] = item['appName']
+         
+          option_data.push(option)
 
+        });
+        this.setState({ StoredApplicationOption: option_data },() => {
+          this.setState({ loading: false })
+        });
+      }
+    })
+  }
   submit() {
     // console.log(e)
     const payload = {
@@ -56,9 +77,8 @@ class NewTrainForm extends React.Component {
       "images_prefix": this.state.IMGPREFIX,
       "labels_prefix": this.state.LABELPREFIX,
       "output_s3uri": this.state.S3OUT,
+      "storedApplication": this.state.StoredApplication.value,
     };
-    const HEADERS = { 'Content-Type': 'application/json' };
-    const apiUrl = '/create_trainjob';
     // var result = "=> call"  + apiUrl + "\n";
     var result = "";
 
@@ -117,7 +137,7 @@ class NewTrainForm extends React.Component {
         onSubmit={console.log}
       >
         <FormSection header={t('Create new Training Job')} >
-          <FormField label="Input S3 URI" hintText="e.g. [bucket name]/[prefix]" controlId="formFieldId1">
+          {/* <FormField label="Input S3 URI" hintText="e.g. [bucket name]/[prefix]" controlId="formFieldId1">
             <Input type="text" controlId="input_s3uri" value={this.state.S3IN} onChange={(e) => this.handelS3IN(e)} />
           </FormField>
           <FormField label="Input images prefix" hintText="e.g. images" controlId="formFieldId2">
@@ -126,8 +146,16 @@ class NewTrainForm extends React.Component {
           <FormField label="Input labels prefix" hintText="e.g. labels" controlId="formFieldId3">
             <Input type="text" controlId="labels_prefix" value={this.state.LABELPREFIX} onChange={(e) => this.handelLABELPREFIX(e)} />
           </FormField>
-          <FormField label="Output S3 URI" hintText="e.g. [bucket name]/[prefix]" controlId="formFieldId42">
+          <FormField label="Output S3 URI" hintText="e.g. [bucket name]/[prefix]" controlId="formFieldId4">
             <Input type="text" controlId="output_s3uri" value={this.state.S3OUT} onChange={(e) => this.handelS3OUT(e)} />
+          </FormField> */}
+          <FormField label="Stored Application" controlId="formFieldId5">
+            <Select 
+              options={this.state.StoredApplicationOption}
+              onChange={(e) => this.setState({StoredApplication: this.state.StoredApplicationOption.find(o => o.value === e.target.value)})}
+              // onChange={(e) => console.log(e.target.value)}
+              selectedOption={this.state.StoredApplication}
+            />
           </FormField>
         </FormSection>
       </Form>
