@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    commands: # installing panorama cli
+      - aws --version
+  pre_build:
+    commands:
+      - echo Nothing to do in the pre_build phase...
+  build:
+    commands: # TODO: download from S3 and upload to S3, rmb to grant S3 access to IAM.
+      - echo $PRETRAIN_BUCKET 
+      - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - cd script
+      - aws s3 cp training-input/ $PRETRAIN_BUCKET --recursive
+      - bash matlab_pull_and_push.sh ap-southeast-1
+      - bash yolov5_pull_and_push.sh ap-southeast-1
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      # - aws stepfunctions send-task-failure --task-token $TASK_TOKEN 
+  
+  
