@@ -20,10 +20,10 @@ def handler(event, context):
     for item in resource['Items']:
         print(item)
     """
-    # body = json.loads(event['body'])
     body = json.loads(event["body"], parse_float=Decimal)
     # body = event['body']
     print(body["CameraID"])
+    
     # Find the original table field
     original_item = table.get_item(Key={"CameraID": body["CameraID"], "TimeStamp": body["TimeStamp"]})
 

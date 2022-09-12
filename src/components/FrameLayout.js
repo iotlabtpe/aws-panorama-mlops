@@ -6,9 +6,7 @@ import AppLayout from 'aws-northstar/layouts/AppLayout';
 import SideNavigation from 'aws-northstar/components/SideNavigation';
 import BreadcrumbGroup from 'aws-northstar/components/BreadcrumbGroup';
 import { withTranslation } from 'react-i18next'
-import Link from 'aws-northstar/components/Link';
 import Box from 'aws-northstar/layouts/Box';
-import Button from 'aws-northstar/components/Button';
 import ButtonDropdown from 'aws-northstar/components/ButtonDropdown';
 import Header from 'aws-northstar/components/Header';
 
@@ -50,23 +48,6 @@ class FrameLayout extends React.Component {
                 },
             ]
         },
-        // [{
-        //     "type": SideNavigationItemType.LINK,
-        //     "text": t("Local Inference") ,
-        //     "expanded": true,
-        //     "items": [
-        //         {
-        //             "type": SideNavigationItemType.LINK,
-        //             "text": t("Box Detect A"),
-        //             "href": "/local_helmet"
-        //         },
-        //         {
-        //             "type": SideNavigationItemType.LINK,
-        //             "text": t("Box Detect B"),
-        //             "href": "/local_helmet2"
-        //         },
-        //     ]
-        // },
         {
             "type": SideNavigationItemType.LINK,
             "text": t("Application"),
@@ -74,37 +55,21 @@ class FrameLayout extends React.Component {
             "items": [
                 {
                     "type": SideNavigationItemType.LINK,
-                    "text": t("Deployment Config"),
+                    "text": t("Stored Application"),
+                    "href": "/StoredApplicationConfig"
+                },
+                {
+                    "type": SideNavigationItemType.LINK,
+                    "text": t("Deployed Application"),
                     "href": "/DeployConfig"
                 },
                 {
                     "type": SideNavigationItemType.LINK,
-                    "text": t("Training Result"),
+                    "text": t("Packaged Application"),
                     "href": "/TrainingList"
                 },
             ]
         },
-        // {
-        //     "type": SideNavigationItemType.LINK,
-        //     "text": t("Inference on Cloud"),
-        //     "expanded": true,
-        //     "items": [{
-        //             "type": SideNavigationItemType.LINK,
-        //             "text": t("New Inference"),
-        //             "href": "/NewInferenceTask"
-        //         },
-        //         {
-        //             "type": SideNavigationItemType.LINK,
-        //             "text": t("Manual Verify"),
-        //             "href": "/Verify"
-        //         },
-        //         {
-        //             "type": SideNavigationItemType.LINK,
-        //             "text": t("Export Dataset"),
-        //             "href": "/ExportDataSet"
-        //         },
-        //     ]
-        // },
         {
             "type": SideNavigationItemType.LINK,
             "text": t("Alert Management"),
@@ -131,16 +96,6 @@ class FrameLayout extends React.Component {
             "text": t("Config"),
             "expanded": true,
             "items": [
-                //   {
-                //     "type": SideNavigationItemType.LINK,
-                //     "text": t("Component Config"),
-                //     "href": "/ComponentConfig"
-                //   },
-                //   {
-                //     "type": SideNavigationItemType.LINK,
-                //     "text": t("Model Config"),
-                //     "href": "/ModelConfig"
-                //   },
                 {
                     "type": SideNavigationItemType.LINK,
                     "text": t("Device Config"),
@@ -153,33 +108,6 @@ class FrameLayout extends React.Component {
                 }
             ]
         },
-            // {
-            //     "type": SideNavigationItemType.LINK,
-            //     "text": t("Dashboard"),
-            //     "expanded": true,
-            //     "items": [
-            //         // {
-            //         //     "type": SideNavigationItemType.LINK,
-            //         //     "text": t("Model Dashboard"),
-            //         //     "href": "/Summary"
-            //         // },
-            //         {
-            //             "type": SideNavigationItemType.LINK,
-            //             "text": t("Alert Dashboard"),
-            //             "href": "/Summary2"
-            //         },
-            //     ]
-            // },
-            // {
-            //     "type": SideNavigationItemType.LINK,
-            //     "text": t("QRCode"),
-            //     "href": "/QRCode"
-            // },
-            // 
-            //   "type": SideNavigationItemType.LINK,
-            //   "text": t("Sign Out"),
-            //   "href": "/SignOut"
-            // },   
         ];
 
         return result
@@ -187,6 +115,23 @@ class FrameLayout extends React.Component {
 
     breadcrumbItems(t, current, url1, url2) {
         switch (current) {
+            case "StoredApplicationConfig":
+                return [
+                    {
+                        text: t("Home"),
+                        href: "/",
+                    },
+                    {
+                        text: t("Application"),
+                        href: "/",
+                    },
+                    {
+                        text: t("Stored Application"),
+                        href: "#",
+                    }
+
+
+                ]; 
             case "CameraMonitoring":
                 return [
                     {
@@ -384,16 +329,6 @@ class FrameLayout extends React.Component {
                     text: t("Home"),
                     href: "/",
                 }];
-            // "items": [{
-            //     "type": SideNavigationItemType.LINK,
-            //     "text": t("Box Detect A"),
-            //     "href": "/local_helmet"
-            // },
-            // {
-            //     "type": SideNavigationItemType.LINK,
-            //     "text": t("Box Detect B"),
-            //     "href": "/local_helmet2"
-            // },
             case "LocalA":
                 return [{
                     text: t("Home"),

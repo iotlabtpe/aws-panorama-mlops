@@ -71,30 +71,6 @@ const columnDefinitions = [
     Header: 'Created Time',
     accessor: 'CreatedTime'
   },
-  // {
-  //     'id': 'core_arn',
-  //     width: 200,
-  //     Header: 'arn',
-  //     accessor: 'core_arn'
-  // },
-  // {
-  //     'id': 'type',
-  //     width: 200,
-  //     Header: 'type',
-  //     accessor: 'type'
-  // },
-  // {
-  //     'id': 'use_gpu',
-  //     width: 200,
-  //     Header: 'use_gpu',
-  //     accessor: 'use_gpu'
-  // },
-  // {
-  //     'id': 'storage',
-  //     width: 200,
-  //     Header: 'storage',
-  //     accessor: 'storage'
-  // }
 ]
 
 
@@ -120,7 +96,6 @@ class DeviceCfgTable extends React.Component {
 
   async load_data() {
     await API.get('backend', '/device').then(res => {
-      // await axios.get('/test_cors', {dataType: 'json'}).then(res => {
       console.log('data', res)
       if (res) {
         console.log(res.data)
@@ -188,10 +163,8 @@ class DeviceCfgTable extends React.Component {
           columnDefinitions={columnDefinitions}
           items={this.state.job_list}
           onSelectionChange={(item) => { this.setState({ current: item }) }}
-          // getRowId={this.getRowId}
           loading={this.state.loading}
           disableSettings={false}
-        // onFetchData={this.handleFetchData}
         />
         <Modal title="Delete Device" visible={this.state.visible} onClose={() => this.closeModel()}>
           {this.state.responseMessage}

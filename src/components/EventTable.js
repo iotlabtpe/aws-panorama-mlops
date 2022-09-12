@@ -13,10 +13,6 @@ import { connect } from 'react-redux'
 
 
 import { API } from 'aws-amplify';
-import axios from 'axios'
-
-// import { createHashHistory } from 'history';
-// const hashHistory = createHashHistory();
 
 import {withTranslation} from 'react-i18next'
 
@@ -31,12 +27,6 @@ const MapDispatchTpProps = (dispatch) => {
 
 const columnDefinitions = [
 
-    // {
-    //     'id': 'id',
-    //     width: 100,
-    //     Header: 'id',
-    //     accessor: 'id'
-    // },
     {
         'id': 'name',
         width: 100,
@@ -61,24 +51,6 @@ const columnDefinitions = [
         Header: 'device_id',
         accessor: 'device_id'
     },
-    // {
-    //     'id': 'status',
-    //     width: 150,
-    //     Header: 'status',
-    //     accessor: '',
-    //     Cell: ({ row  }) => {
-    //          if (row && row.original.status) {
-    //              if(row.original.status == 'Complete'){
-    //                  return <StatusIndicator statusType="positive">Complete</StatusIndicator>;
-    //              }else{
-    //                  return <StatusIndicator statusType="info">Procressing</StatusIndicator>;
-    //              }
-    //          }else{
-    //              return <StatusIndicator statusType="warning">New</StatusIndicator>;
-    //          }
-    //     }
-    // },
-
     {
         'id': 'detail',
         width: 200,
@@ -141,8 +113,6 @@ class  EventTable extends React.Component {
 
 
   async load_data(){
-    // const url = 'http://localhost:7300/mock/619312aa31c2f2583685aebb/example/list_event'
-    const url = '/list_event'
     await API.get('backend','/event').then(res => {
         console.log(res)
         if (res){
@@ -150,15 +120,7 @@ class  EventTable extends React.Component {
             var _tmp_data = []
             res.forEach((item)=>{
                 var _tmp = {}
-                // _tmp['job_id'] = item['job_id']
-                // _tmp['bot_name'] = item['bot_name']
-                // _tmp['creatation_time'] = item['creatation_time']
-                // _tmp['number_of_files'] = item['number_of_files']
-                // _tmp['number_of_bots'] = item['number_of_bots']
-                // _tmp['input'] = 's3://'+item['bucket']+'/'+'[TBD]'
-                // _tmp['output'] = 's3://'+item['output_s3_bucket']+'/'+item['output_s3_prefix']
 
-                _tmp['id'] = item ['time']
                 _tmp['key'] = item['key']
                 _tmp['device_id'] = item['device_id']
                 _tmp['flag'] = item['flag']
@@ -189,7 +151,6 @@ class  EventTable extends React.Component {
                 this.setState({loading:false})
             })
         }
-        // console.log(this.state.model_list)
         return res.data
     })
   }
@@ -232,15 +193,11 @@ class  EventTable extends React.Component {
                     multiSelect={false}
                     columnDefinitions={columnDefinitions}
                     items={this.state.job_list}
-                    // onSelectionChange={(item)=>{this.setState({curent:item})}}
                     onSelectionChange={(item)=>{this.change_select(item)}}
                     getRowId={this.getRowId}
                     loading={this.state.loading}
                     disableSettings={false}
-                    // selectedRowIds={['d9129cf1-2642-46ca-ab67-c3d03a67667d']}
                     selectedRowIds={this.state.curent_id}
-                    // getRowId={getRowId}
-                    // onFetchData={this.handleFetchData}
                 />
                                             </Grid>  
                             <Grid item xs={1}></Grid>
@@ -252,25 +209,6 @@ class  EventTable extends React.Component {
                     <Grid item xs={10}>
                         <Container headingVariant="h4" title={t('Original Pic')}>
                         <Grid container>
-                            {/* <Grid item xs={11}>
-                                <video
-                                    style={{width:'98%', height:'100%' , 'objectfit': 'fill'}}
-                                    id="my-video"
-                                    src={(this.state.current && this.state.current[0])?this.state.current[0].video:null}
-                                    poster={(this.state.current && this.state.current[0])?this.state.current[0].picture:null} 
-                                    controls="controls"
-                                    // autoplay="autoplay"
-                                    loop="loop"
-                                    preload="auto"
-                                    webkit-playsinline="true" 
-                                    playsinline="true"
-                                    x-webkit-airplay="allow" 
-                                    x5-playsinline
-                                    x5-video-player-type="h5" 
-                                    x5-video-player-fullscreen="true"  
-                                    x5-video-orientation="portraint"
-                                />
-                                </Grid> */}
                             <Grid item xs={12}>
                                 <img alt=""
                                     style={{width:'100%', height:'100%' , 'objectfit': 'fill'}}

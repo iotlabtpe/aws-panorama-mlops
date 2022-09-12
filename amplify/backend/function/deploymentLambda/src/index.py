@@ -15,7 +15,6 @@ override_camera_template = {
 
 arn_role = boto3.client("ssm").get_parameter(Name="/ppe/config/arn/" + os.environ["ENV"])["Parameter"]["Value"]
 env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])["Parameter"]["Value"]
-TABLE_NAME = "Deployment-" + env_p
 
 # Hack to print to stderr so it appears in CloudWatch.
 def eprint(*args, **kwargs):
@@ -25,23 +24,11 @@ def eprint(*args, **kwargs):
 def post(event, account_id):
     print(event)
     eprint("env", env_p)
-    db = boto3.resource("dynamodb")
     s3 = boto3.resource("s3")
     pano_client = boto3.client("panorama")
-    table = db.Table(TABLE_NAME)
     body = json.loads(event["body"])
-    # print(body['Device_ID'])
-    # print(body['Camera_ID'])
-    # print(body['Component_Version_ID'])
-    # print(body['Model_Version_ID'])
-    # print(body['targetArn'])
-    # print(body['deploymentName'])
-    # print(body['components'])
-    # print(body['deploymentPolicies'])
-    # print(body['iotJobConfigurations'])
-    # Use Model_Version_ID for Panorama camera list
-
-    cameras = body["Model_Version_ID"].split(",")
+   
+    cameras = body["cameraNames"].split(",")
 
     for camera in cameras:
         override_camera_template["nodeGraphOverrides"]["packages"].append(
@@ -86,7 +73,6 @@ def post(event, account_id):
             },
         }
 
-    # Use Comonent_Version_ID for Panorama device id
 
     # TODO Need to create a system parameter to access role for panorama service
     try:
@@ -94,7 +80,7 @@ def post(event, account_id):
             Name=body["deploymentName"],
             ManifestPayload={"PayloadData": json.dumps(payload)},
             ManifestOverridesPayload={"PayloadData": json.dumps(override_camera_template)},
-            DefaultRuntimeContextDevice=body["Component_Version_ID"],
+            DefaultRuntimeContextDevice=body["deviceId"],
             RuntimeRoleArn=arn_role,
         )
         eprint(resp)
@@ -120,49 +106,11 @@ def post(event, account_id):
             },
         }
 
-    # try:
-    #     response = table.put_item(
-    #         Item={
-    #             "DeploymentID": body["Deployment_ID"],
-    #             "DeviceID": body["Device_ID"],
-    #             "CameraID": body["Camera_ID"],
-    #             "ComponentVersionID": body["Component_Version_ID"],
-    #             "ModelVersionID": body["Model_Version_ID"],
-    #             "TargetArn": body["targetArn"],
-    #             "DeploymentName": body["deploymentName"],
-    #             "components": body["components"],
-    #             "deploymentPolicies": body["deploymentPolicies"],
-    #             "iotJobConfigurations": body["iotJobConfigurations"],
-    #         }
-    #     )
-    #     return {
-    #         "statusCode": response["ResponseMetadata"]["HTTPStatusCode"],
-    #         "body": body["Deployment_ID"],
-    #         "headers": {
-    #             "Access-Control-Allow-Headers": "*",
-    #             "Access-Control-Allow-Origin": "*",
-    #             "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
-    #         },
-    #     }
-    # except Exception as e:
-    #     # raise e
-    #     eprint(e)
-    #     return {
-    #         "statusCode": 500,
-    #         "body": "Error!!",
-    #         "headers": {
-    #             "Access-Control-Allow-Headers": "*",
-    #             "Access-Control-Allow-Origin": "*",
-    #             "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
-    #         },
-    #     }
-
+   
 
 def get(event):
     print(event)
     eprint(">>> Start query config.")
-    # db = boto3.resource("dynamodb")
-    # table = db.Table(TABLE_NAME)
     panorama_client = boto3.client("panorama")
 
     try:

@@ -6,19 +6,12 @@ import FormSection from 'aws-northstar/components/FormSection';
 import Input from 'aws-northstar/components/Input';
 import Select from 'aws-northstar/components/Select';
 import Multiselect from 'aws-northstar/components/Multiselect';
-
 import Modal from 'aws-northstar/components/Modal';
-import axios from 'axios';
+
 import { API } from 'aws-amplify';
 
 import React from 'react';
 import { connect } from 'react-redux'
-import Textarea from 'aws-northstar/components/Textarea';
-
-import { v4 as uuidv4 } from 'uuid';
-
-// import mockData from '../mock/mockData'
-
 import { withTranslation } from 'react-i18next'
 import { LoadingIndicator } from 'aws-northstar';
 
@@ -51,14 +44,8 @@ class NewDeployForm extends React.Component {
       Chose_Device: {},
       Chose_Device_UUID: "device-ylaq25peslngbrowu2bmlqxp24",
 
-      Deployment_ID: uuidv4(),
-      Device_ID: '111',
-      Component_Version_ID: '333',
       targetArn: 's3://app-graph-4c1bb430-172b-11ed-b380-0647bab7fb5a/graph/ppa-2022-08-08-16-00-25/graph.json',
-      deploymentName: 'Cam_1 Deployment',
-      components: JSON.stringify({ "componentVersion": "1.0.0", "configurationUpdate": { "reset": ["/network/useHttps", "/tags"], "merge": { "tags": ["/boiler/1/temperature", "/boiler/1/pressure", "/boiler/2/temperature", "/boiler/2/pressure"] } } }),
-      deploymentPolicies: JSON.stringify({ "componentUpdatePolicy": { "action": "NOTIFY_COMPONENTS", "timeoutInSeconds": 30 }, "configurationValidationPolicy": { "timeoutInSeconds": 60 }, "failureHandlingPolicy": "ROLLBACK" }),
-      iotJobConfigurations: JSON.stringify({ "abortConfig": { "criteriaList": [{ "action": "CANCEL", "failureType": "ALL", "minNumberOfExecutedThings": 100, "thresholdPercentage": 5 }] }, "jobExecutionsRolloutConfig": { "exponentialRate": { "baseRatePerMinute": 5, "incrementFactor": 2, "rateIncreaseCriteria": { "numberOfNotifiedThings": 10, "numberOfSucceededThings": 5 } }, "maximumPerMinute": 50 }, "timeoutConfig": { "inProgressTimeoutInMinutes": 5 } }),
+      deploymentName: 'Deployment APP',
       visible: false,
       post_result: '',
     }
@@ -142,17 +129,10 @@ class NewDeployForm extends React.Component {
   submit() {
     // console.log(e)
     const payload = {
-      "Deployment_ID": this.state.Deployment_ID,
-      "Device_ID": this.state.Chose_Device_UUID,
-      "Camera_ID": this.state.Chose_Camera.value,
-      "Component_Version_ID": this.state.Chose_Device_UUID,
-      "Model_Version_ID": this.state.Chose_Camera_Name,
+      "deviceId": this.state.Chose_Device_UUID,
+      "cameraNames": this.state.Chose_Camera_Name,
       "targetArn": this.state.targetArn,
       "deploymentName": this.state.deploymentName,
-      "components": this.state.components,
-      "deploymentPolicies": this.state.deploymentPolicies,
-      "iotJobConfigurations": this.state.iotJobConfigurations,
-
     };
 
     // const HEADERS = {'Content-Type': 'application/json'};
@@ -163,31 +143,18 @@ class NewDeployForm extends React.Component {
     console.log(payload);
     API.post('backend', '/deployment', { body: payload }).then(response => {
       console.log(response);
-      if (response.status === 200) {
-        result = "Post Deployment request successfully !"
-      } else {
-        result = "Post Deployment request successfully !"
+      if (response) { 
+        this.setState({ post_result: response }, () => {
+          this.setState({ visible: true })
+        })
       }
-      this.setState({ post_result: result }, () => {
+      // console.log(result)
+    }).catch((e)=>{
+      console.log(e) 
+      this.setState({ post_result: "Something wrong with the input" }, () => {
         this.setState({ visible: true })
       })
-      // console.log(result)
     })
-    // axios({ method: 'POST', url: `${apiUrl}`, data: payload ,headers: HEADERS}).then(response => {
-    //     console.log(response);
-    //     if (response.status === 200) {
-    //         result = "Post Deployment request successfully !"
-    //     } else {
-    //         result = "Post Deployment request  error !"
-    //     }
-    //     this.setState({post_result:result},()=>{
-    //       this.setState({visible:true})
-    //     })
-    //     // console.log(result)
-    // })
-
-    // this.setState({visible:true})
-    // this.props.history.push("/")
   }
 
   closeModel() {
@@ -211,10 +178,7 @@ class NewDeployForm extends React.Component {
     })
     const name = nameArray.join();
     console.log(name);
-    // const selected = this.state.All_Cameras_Options.find((o) => o.value === e.target.value);
-    // const name = this.state.Cameras.find((o) => o.NodeId === e.target.value).Name;
     this.setState({ Chose_Camera_Name: name });
-    // this.setState({ Chose_Camera: selected })
 
   }
 
@@ -246,8 +210,9 @@ class NewDeployForm extends React.Component {
           onSubmit={(e) => this.handleDeploy(e)}
         >
           <FormSection header={t("New Deployment")}>
-            <FormField label="Deployment ID" controlId="formFieldId0">
-              <Input type="text" controlId="input_dep_id" value={this.state.Deployment_ID} readonly />
+
+            <FormField label="APP Name" controlId="formFieldId6">
+              <Input type="text" controlId="input_dn" value={this.state.deploymentName} onChange={(e) => this.handelInputChange(e, 'deploymentName')} />
             </FormField>
 
             <FormField label="Device Name" controlId="formFieldId1">
@@ -276,32 +241,14 @@ class NewDeployForm extends React.Component {
               {/* <Text>{this.state.Chose_Camera_Name}</Text> */}
             </FormField>
 
-
-            <FormField label="APP Name" controlId="formFieldId6">
-              <Input type="text" controlId="input_dn" value={this.state.deploymentName} onChange={(e) => this.handelInputChange(e, 'deploymentName')} />
-            </FormField>
-
             <FormField label="Graph.json Target S3 Position" controlId="formFieldId5">
               <Input type="text" controlId="input_targetArn" value={this.state.targetArn} onChange={(e) => this.handelInputChange(e, 'targetArn')} />
             </FormField>
 
-            {/* <FormField label="Components" controlId="formFieldId7">
-                  <Textarea classname="LabelText" rows="10"  readonly={false} value={this.state.components} onChange={(e)=>this.handleTextChange(e,'components')}> </Textarea> 
-                </FormField> */}
-
-            {/* <FormField label="Deployment Policies" controlId="formFieldId7">
-                  <Textarea classname="LabelText" rows="10"  readonly={false} value={this.state.deploymentPolicies} onChange={(e)=>this.handleTextChange(e,'deploymentPolicies')}> </Textarea> 
-                </FormField> */}
-
-            {/* <FormField label="IoT Job Configurations" controlId="formFieldId7">
-                  <Textarea classname="LabelText" rows="10"  readonly={false} value={this.state.iotJobConfigurations} onChange={(e)=>this.handleTextChange(e,'iotJobConfigurations')}> </Textarea> 
-                </FormField> */}
-
           </FormSection>
         </Form>
           <Modal title="Deploy" visible={this.state.visible} onClose={() => this.closeModel()}>
-            {/* {this.state.post_result} */}
-            Successfully Deploy the application!!!
+            {this.state.post_result}
           </Modal></>}
 
       </div>

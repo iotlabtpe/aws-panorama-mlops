@@ -1,0 +1,53 @@
+version: 0.2
+
+phases:
+  install:
+    commands: # installing panorama cli
+      - echo $TASK_TOKEN
+      - aws --version
+      - pip3 install boto3 # not sure if necessary
+      - pip3 install panoramacli
+  pre_build:
+    commands:
+      - echo Nothing to do in the pre_build phase...
+  build:
+    commands: # TODO: download from S3 and upload to S3, rmb to grant S3 access to IAM.
+      - cd deployment/ppe_panorama_app
+      - echo $DB_TABLE_NAME
+      - echo $MODEL_NAME
+      - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+      - export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - aws s3 cp $MODEL_S3 ./
+      - tar zxvf model.tar.gz
+      - panorama-cli import-application
+      - ls -lh ./packages/$ACCOUNT_ID-ppe_panorama_app-1.0/src/yolov5s.onnx
+      # - cp ./visualsearch/weights/best.onnx ./packages/$ACCOUNT_ID-ppe_panorama_app-1.0/src/yolov5s.onnx
+      - ls -lh ./packages/$ACCOUNT_ID-ppe_panorama_app-1.0/src/yolov5s.onnx
+      # - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 201125699002.dkr.ecr.ap-southeast-1.amazonaws.com
+      - panorama-cli build  --container-asset-name ppe_panorama_app  --package-path packages/$ACCOUNT_ID-ppe_panorama_app-1.0/
+      - panorama-cli package-application
+      - aws s3 cp graphs/ppe_panorama_app/graph.json $GRAPH_S3
+      - >
+        aws dynamodb update-item \
+          --table-name $DB_TABLE_NAME \
+          --key '{
+            "model_name": {"S": "'$MODEL_NAME'"}
+          }' \
+          --update-expression 'SET #url = :url' \
+          --expression-attribute-names '{
+            "#url": "trainingJobModelDataUrl"
+          }' \
+          --expression-attribute-values '{
+            ":url": {"S": "'$GRAPH_S3'"}
+          }'
+      - aws stepfunctions send-task-success --task-token $TASK_TOKEN --task-output {}
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - find ./ | grep json | grep graph
+      - pwd
+      # - aws stepfunctions send-task-failure --task-token $TASK_TOKEN 
+artifacts:
+  files:
+  - ppe_panorama_app/graphs/ppe_panorama_app/graph.json
+  

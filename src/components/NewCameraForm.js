@@ -9,16 +9,10 @@ import FormSection from 'aws-northstar/components/FormSection';
 import Input from 'aws-northstar/components/Input';
 
 import Modal from 'aws-northstar/components/Modal';
-import axios from 'axios';
-import Amplify, { API } from 'aws-amplify';
+import { API } from 'aws-amplify';
 import React  from 'react';
 import { connect } from 'react-redux' 
 import Textarea from 'aws-northstar/components/Textarea';
-
-import {v4 as uuidv4} from 'uuid';
-
-// import mockData from '../mock/mockData'
-
 import {withTranslation} from 'react-i18next'
 
 const mapStateToProps = state => {
@@ -35,13 +29,11 @@ class  NewCameraForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      camera_id:uuidv4(),
-      address:'rtsp://1.1.1.1/',
+      streamUrl:'rtsp://1.1.1.1/',
       description:'lobby camera1',
-      location:'Nanchang_F_1',
-      brand:'Hikvision',
-      network:'5G',
-      image_size:'1280*720',
+      username:'',
+      cameraName:'',
+      password:'',
       visible:false,
       post_result:'',
     }
@@ -58,35 +50,29 @@ class  NewCameraForm extends React.Component {
   submit(){
     // console.log(e)
     const payload = {
-      "camera_id":this.state.camera_id,
-      "address": this.state.address,
+      "streamUrl": this.state.streamUrl,
       "description": this.state.description,
-      "location": this.state.location,
-      "brand":this.state.brand,
-      "network": this.state.network,
-      "image_size": this.state.image_size
+      "username": this.state.username,
+      "cameraName":this.state.cameraName,
+      "password": this.state.password,
     };
     console.log(payload);
-    const HEADERS = {'Content-Type': 'application/json'};
-    const apiUrl = '/camera';
-    // var result = "=> call"  + apiUrl + "\n";
     var result = "";
 
     API.post('backend','/camera',{ body: payload }).then(response => {
         console.log(response);
-        if (response.status === 200) {
+        if (response) {
             result = "Post Component request successfully !"
-        } else {
-            result = "Post Component request  error !"
         }
         this.setState({post_result:result},()=>{
           this.setState({visible:true})
         })
         // console.log(result)
+    }).catch(()=>{
+      this.setState({post_result:"There are something wrong with the request"},()=>{
+        this.setState({visible:true})
+      })
     })
-
-    this.setState({visible:true})
-    // this.props.history.push("/")
   }
 
   closeModel(){
@@ -118,38 +104,30 @@ class  NewCameraForm extends React.Component {
             onSubmit={console.log}
         >
             <FormSection header={t("New Camera Config")}>
-                 <FormField label="Camera ID" controlId="formFieldId0">
-                    <Input type="text" controlId="camera_id" value={this.state.camera_id} readonly />
+
+                <FormField label="Camera Name" controlId="formFieldId1">
+                    <Input type="text" controlId="cameraName" value={this.state.cameraName} onChange={(e)=> this.handelInputChange(e,'cameraName')}  />
                 </FormField>
 
-                <FormField label="Address" controlId="formFieldId1">
-                    <Input type="text" controlId="address" value={this.state.address} onChange={(e)=> this.handelInputChange(e,'address')}  />
+                <FormField label="Stream Url" controlId="formFieldId2">
+                    <Input type="text" controlId="streamUrl" value={this.state.streamUrl} onChange={(e)=> this.handelInputChange(e,'streamUrl')}  />
                 </FormField>
 
-                <FormField label="Description" controlId="formFieldId6">
+                <FormField label="Description" controlId="formFieldId3">
                   <Textarea classname="LabelText" rows="10"  readonly={false} value={this.state.description} onChange={(e)=>this.handleTextChange(e,'description')}> </Textarea> 
                 </FormField>
 
-                <FormField label="Name" controlId="formFieldId3">
-                    <Input type="text" controlId="brand" value={this.state.brand} onChange={(e)=> this.handelInputChange(e,'brand')}  />
+                <FormField label="Username" controlId="formFieldId4">
+                    <Input type="text" controlId="username" value={this.state.username} onChange={(e)=> this.handelInputChange(e,'username')}  />
                 </FormField>
 
-                <FormField label="Account" controlId="formFieldId2">
-                    <Input type="text" controlId="location" value={this.state.location} onChange={(e)=> this.handelInputChange(e,'location')}  />
-                </FormField>
-
-                <FormField label="Password" controlId="formFieldId4">
-                    <Input type="text" controlId="network" value={this.state.network} onChange={(e)=> this.handelInputChange(e,'network')}  />
-                </FormField>
-
-                <FormField label="Image Size" controlId="formFieldId5">
-                    <Input type="text" controlId="image_size" value={this.state.image_size} onChange={(e)=> this.handelInputChange(e,'image_size')}  />
+                <FormField label="Password" controlId="formFieldId5">
+                    <Input type="text" controlId="password" value={this.state.password} onChange={(e)=> this.handelInputChange(e,'password')}  />
                 </FormField>
             </FormSection>
         </Form>
         <Modal title="Add Camera" visible={this.state.visible} onClose={() => this.closeModel()}>
-            {/* {this.state.post_result} */}
-            The Camera is successfully added !!!
+            {this.state.post_result}
         </Modal>
       </div>
     )
@@ -160,11 +138,4 @@ class  NewCameraForm extends React.Component {
 export default connect(mapStateToProps,MapDispatchTpProps)(withTranslation()(NewCameraForm));
 
 
-// camera_id
-// address
-// description
-// location
-// brand
-// network
-// image_size
 

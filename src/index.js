@@ -1,8 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import { Route ,Switch } from 'react-router';
-// import { createHashHistory } from 'history';
-// import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import NorthStarThemeProvider from 'aws-northstar/components/NorthStarThemeProvider';

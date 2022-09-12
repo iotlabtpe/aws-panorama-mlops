@@ -1,4 +1,3 @@
-import json
 import boto3
 import os
 
@@ -10,8 +9,6 @@ state_arn = boto3.client("ssm").get_parameter(
 
 sfs = boto3.client("stepfunctions")
 
-# sfs = boto3.client('stepfunctions')
-
 
 def handler(event, context):
     input = event["body"]
@@ -20,7 +17,6 @@ def handler(event, context):
     response = sfs.start_execution(stateMachineArn=state_arn, input=input)
 
     print(response)
-    # TODO implement
     return {
         "statusCode": 200,
         "body": "task - "

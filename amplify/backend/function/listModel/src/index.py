@@ -13,27 +13,6 @@ def handler(event, context):
     response = table.scan()
     print(response)
     body = json.dumps(response)
-    # model_name = None
-    # # if event['pathParameters'] != None:
-    # #     model_name = event['pathParameters']['model_name']
-
-    # # model_tag = "default"
-
-    # # if event['queryStringParameters'] != None:
-    # #     if 'tag' in event['queryStringParameters']:
-    # #         model_tag = event['queryStringParameters']['tag']
-
-    # if model_name == None:
-    #     items = table.scan(FilterExpression=Attr('model_tag').eq(model_tag))
-    #     for item in items:
-    #         process_item(item)
-    #     body = json.dumps(items)
-    # else:
-    #     params = {}
-    #     params['model_name'] = model_name
-    #     item = table.get_item(params)
-    #     process_item(item)
-    #     body = json.dumps(item)
     return {
         "statusCode": 200,
         "body": body,
@@ -52,8 +31,6 @@ def process_item(item):
     files = item["files"]
     presigned_urls = []
     model_data_url = item["trainingJobModelDataUrl"]
-    # s3://app-graph-cd14bfe0-1231-11ed-b64e-06ca11bc4d14/graph/ppa-2022-08-03-05-37-59/graph.json
-    # s3://retrainoutput-cd14bfe0-1231-11ed-b64e-06ca11bc4d14/ppa-2022-08-03-05-37-59/output/model.tar.gz
     last = model_data_url.rfind("/")
     for file in files:
         print(file)
@@ -74,7 +51,7 @@ def get_presigned_url(bucket, file_key):
             ExpiresIn=1000,
         )
         print("Got presigned URL: {}".format(url))
-    except ClientError:
-        print("Couldn't get a presigned URL for client method {}.".format(client_method))
+    except:
+        print("Couldn't get a presigned URL for client method")
         raise
     return url
