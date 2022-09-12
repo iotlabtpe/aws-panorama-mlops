@@ -1,4 +1,4 @@
-# PPE Amplify One Click Installation 
+# Panorama MLOps Installation
 
 ## Note:
 
@@ -24,14 +24,14 @@ Next, you can head to the [Amplify Console](https://ap-southeast-1.console.aws.a
 ![](https://i.imgur.com/2CCl4uM.png)
 
 
-Grant access to your AWS account using you Github, and choose **amplify-oneClick** on Branch **prod**
+Grant access to your AWS account using you Github, and choose **aws-panorama-mlops** on Branch **prod**
 
 ![Screen Shot 2022-08-29 at 9 48 34 AM](https://user-images.githubusercontent.com/61721490/187107270-80101b20-bbaf-4ea4-b982-d26932368b24.png)
 
 
 Fill in the name you want and the environment name you like, after that you have to **create a new role**
 
-![](https://i.imgur.com/Np5kAwy.png)
+![Screen Shot 2022-08-29 at 1 34 06 PM](https://user-images.githubusercontent.com/61721490/187129927-b34ce108-09c2-4018-81df-ae46516204a4.png)
 
 During creating a new role, you can just click next until the Create Role is completed, here are the example pictures
 
@@ -69,7 +69,7 @@ Choose **JSON** and paste the following JSON into the rule like the picture belo
                 "lambda:*",
                 "sagemaker:*",
                 "panorama:*",
-                "ecs:*",
+                "ecr:*",
                 "ec2:*"
             ],
             "Resource": "*"
@@ -176,7 +176,7 @@ Set the **Build timeout to be 60 minutes**
 
 <img width="1749" alt="Screen Shot 2022-08-24 at 2 12 37 PM" src="https://user-images.githubusercontent.com/61721490/186344017-31736dec-e491-4cce-a383-294305263bd3.png">
 
-Go back to the Buliding Graph by click on your App name ( default is amplify-oneClick ) on the left menu 
+Go back to the Buliding Graph by click on your App name ( default is aws-panorama-mlops ) on the left menu 
 
 Because when we first deploy the APP, it will use the 30 minutes build time out setting for our deployment, we will need to redeploy so the APP will follow our new settings
 
@@ -194,7 +194,6 @@ You can click on the **Domain URL** to see your own PPE below!!!
 
 <img width="1789" alt="Screen Shot 2022-08-24 at 2 17 23 PM" src="https://user-images.githubusercontent.com/61721490/186344780-2f66fbdb-0946-4ec4-be53-cff7c2e5130b.png">
 
-
 ## How to use the PPE with Panorama
 
 The following will teach you how to deploy **a Human Detector APP on Panorama and monitor the results using PPE** 
@@ -211,7 +210,8 @@ Click on **New training, and just click on Submit,** we don’t have to input an
 
 
 After that you will **see a field with training icon in your application, it means the training begin**, you can do other steps and come back after the training finished 
-[Image: Image.jpg]
+
+![Screen Shot 2022-08-29 at 1 37 15 PM](https://user-images.githubusercontent.com/61721490/187130256-d8e42f11-1027-4ba8-9d7a-c9c6beacd18e.png)
 
 The training has two phase, the first phase is to output a model to your **retrain bucket** which shows below 
 
@@ -264,6 +264,7 @@ After complete all the field, you can click on **Submit**
 After that, you can see your application status at **Deployed Application** or you can go to [Panorama Console](https://ap-southeast-1.console.aws.amazon.com/panorama/home?region=ap-southeast-1#), and click on **Deployed applications,** you will  see your APP is being deployed, please wait for 30-60 minutes, then see your **Application is running with green light,** you can go to next step
 
 <img width="1772" alt="Screen Shot 2022-08-24 at 2 35 42 PM" src="https://user-images.githubusercontent.com/61721490/186347696-881c6172-c622-4a4e-9235-18adc4954d92.png">
+
 
 
 ## **Use the Panorama Application with PPE**
@@ -344,7 +345,38 @@ There are three ways to delete PPE, you will need to combine two of them to dele
 3. On the **App** page, select the **Actions** dropdown list. Then, choose **Delete app**.
 
 
-**After that, if you still see your APP in the Amplify Console, you will need to use AWS CLI to completely delete the APP**
+**After that, if you still see your APP in the Amplify Console, you will need to use AWS CLI and CloudFormation to completely delete the APP**
+
+### Using CloudFormation 
+
+Go to [AWS CloudForamtion Console](https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks?filteringStatus=active&filteringText=&viewNested=false&hideStacks=false&stackId=), if you see a lot of stack, uncheck **view Nested** then you will see the following.
+
+<img width="1492" alt="Screen Shot 2022-08-30 at 8 02 34 PM" src="https://user-images.githubusercontent.com/61721490/187431895-fa375a61-7e64-4d99-838f-5b367ddce37f.png">
+
+Choose the one with the environment name you just created, default will be **prodline**, click on Delete. 
+
+After that you will see the **Delete failed**, choose **view nested**
+
+You can see there's one nested stack which also fail to delete, 
+
+<img width="1468" alt="Screen Shot 2022-08-30 at 8 08 25 PM" src="https://user-images.githubusercontent.com/61721490/187432853-ee9e5b85-ebcf-4cb0-948b-8d9deb297b53.png">
+
+Click on the nested stack with **custom resource** and **Delete** again, you will see the following 
+
+<img width="1301" alt="Screen Shot 2022-08-30 at 8 15 39 PM" src="https://user-images.githubusercontent.com/61721490/187434162-8cc68879-a6a8-44aa-8cf7-5bf0e103b077.png">
+
+You can have two choices, one is click on the resource, and **go to the resource to delete the s3 bucket**, or select the resource to **retain the resource** and delete again like the following pic 
+
+<img width="1003" alt="Screen Shot 2022-08-30 at 8 24 17 PM" src="https://user-images.githubusercontent.com/61721490/187435788-908a09d8-6a93-4389-a0b1-51a161730e55.png">
+
+once you do that you will be able to delete the **custom resource** nested stack, then you can delete the stack again.
+
+<img width="1696" alt="Screen Shot 2022-08-30 at 8 35 40 PM" src="https://user-images.githubusercontent.com/61721490/187438120-4d80ee8e-c5f2-42eb-a126-2c4cfffeddc5.png">
+
+This time you don't have to click on **retain custom resource** since we already delete the resource on last step, so just delete 
+
+After that you can move on to **Using AWS CLI to completely delete the resource** 
+
 
 ### Using AWS CLI
 
