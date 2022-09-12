@@ -16,18 +16,19 @@ def handler(event, context):
             )
         
         results = []
-        for object in response['Contents']:
-            s3uri = f's3://{bucket}/{object["Key"]}'
-            result = {
-                'appName': object['Key'],
-                'lastModifiedTime': object['LastModified'].strftime("%Y/%m/%d, %H:%M:%S"),
-                'appUri': s3uri
-                
-            }
-            #print("APP-Name: ",object['Key'])
-            #print("Last-Modified-Time: ", object['LastModified'].strftime("%Y/%m/%d, %H:%M:%S"))
-            #print(f'Storage: s3://{bucket}/{object["Key"]}')
-            results.append(result)
+        if 'Contents' in response:
+            for object in response['Contents']:
+                s3uri = f's3://{bucket}/{object["Key"]}'
+                result = {
+                    'appName': object['Key'],
+                    'lastModifiedTime': object['LastModified'].strftime("%Y/%m/%d, %H:%M:%S"),
+                    'appUri': s3uri
+                    
+                }
+                #print("APP-Name: ",object['Key'])
+                #print("Last-Modified-Time: ", object['LastModified'].strftime("%Y/%m/%d, %H:%M:%S"))
+                #print(f'Storage: s3://{bucket}/{object["Key"]}')
+                results.append(result)
             
         print(results)
         return {
