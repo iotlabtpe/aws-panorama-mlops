@@ -358,6 +358,78 @@ Resources:
         BuildSpec: script/buildspec.yaml
         Location: https://github.com/hardco2020/aws-panorama-mlops.git
         Type: GITHUB
+  DeleteS3Lambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.9
+      Handler: index.handler
+      FunctionName:
+        Fn::Join:
+          - '-'
+          - - deleteS3
+            - Ref: env
+      Environment:
+        Variables:
+          ENV:
+            Ref: env
+      Code:
+        ZipFile: |
+          import json
+          import boto3 
+          import cfnresponse
+          import os
+
+          def bucket_exist(bucketName, buckets):
+            for bucket in buckets:
+                if bucket['Name'] == bucketName:
+                    return True
+            return False
+          def handler(event, context):
+            try:
+              random_p = boto3.client("ssm").get_parameter(Name="/ppe/random/" + os.environ["ENV"])["Parameter"]["Value"]
+              if event['RequestType'] == 'Delete':
+                s3_client = boto3.client('s3')
+                s3_resource = boto3.resource('s3')
+                
+                buckets = s3_client.list_buckets()['Buckets']
+                print(buckets)
+                if(bucket_exist('pretraininput-' + random_p, buckets)):
+                    pretrain = s3_resource.Bucket('pretraininput-' + random_p)
+                    pretrain.object_versions.delete()
+
+                if(bucket_exist('retrainoutput-' + random_p, buckets)):
+                    retrain = s3_resource.Bucket('retrainoutput-' + random_p)
+                    retrain.object_versions.delete()
+                if(bucket_exist('panorama-app-' + random_p, buckets)):
+                    panoramaApp = s3_resource.Bucket('panorama-app-' + random_p)
+                    panoramaApp.object_versions.delete()
+                
+                if(bucket_exist('app-graph-' + random_p, buckets)):
+                    appGraph = s3_resource.Bucket('app-graph-' + random_p)
+                    appGraph.object_versions.delete()
+                if(bucket_exist('event-' + random_p, buckets)):
+                    eventBucket = s3_resource.Bucket('event-' + random_p)
+                    eventBucket.object_versions.delete()
+                if(bucket_exist('export-event-'+ random_p, buckets)):
+                    exportEvent = s3_resource.Bucket('export-event-' + random_p)
+                    exportEvent.object_versions.delete()   
+              responseValue = 120
+              responseData = {}
+              responseData['Data'] = responseValue
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, 
+                responseData, 'scm-cfn-customresource-id')  
+            except Exception as e:
+              print(e)
+              responseValue = 120
+              responseData = {}
+              responseData['Data'] = responseValue
+              cfnresponse.send(event, context, cfnresponse.FAILED, 
+                responseData, 'scm-cfn-customresource-id')
+      Role:
+        Fn::GetAtt:
+          - LambdaRole
+          - Arn
+      Timeout: 300
   PreInstalledModelLambda:
     Type: AWS::Lambda::Function
     Properties:
@@ -410,46 +482,11 @@ Resources:
                     environmentVariablesOverride=env_var,
                 )
                 build_id = build["build"]["id"]
-                responseValue = 120
-                responseData = {}
-                responseData['Data'] = responseValue
-                cfnresponse.send(event, context, cfnresponse.SUCCESS, 
-                  responseData, 'scm-cfn-customresource-id')
-                return {
-                    "statusCode": 200,
-                    "build_id": build_id,
-                }
-              elif event['RequestType'] == 'Delete':
-                s3_client = boto3.client('s3')
-                s3_resource = boto3.resource('s3')
-                
-                buckets = s3_client.list_buckets()['Buckets']
-                print(buckets)
-                if(bucket_exist('pretraininput-' + random_p, buckets)):
-                    pretrain = s3_resource.Bucket('pretraininput-' + random_p)
-                    pretrain.object_versions.delete()
-
-                if(bucket_exist('retrainoutput-' + random_p, buckets)):
-                    retrain = s3_resource.Bucket('retrainoutput-' + random_p)
-                    retrain.object_versions.delete()
-                if(bucket_exist('panorama-app-' + random_p, buckets)):
-                    panoramaApp = s3_resource.Bucket('panorama-app-' + random_p)
-                    panoramaApp.object_versions.delete()
-                
-                if(bucket_exist('app-graph-' + random_p, buckets)):
-                    appGraph = s3_resource.Bucket('app-graph-' + random_p)
-                    appGraph.object_versions.delete()
-                if(bucket_exist('event-' + random_p, buckets)):
-                    eventBucket = s3_resource.Bucket('event-' + random_p)
-                    eventBucket.object_versions.delete()
-                if(bucket_exist('export-event-'+ random_p, buckets)):
-                    exportEvent = s3_resource.Bucket('export-event-' + random_p)
-                    exportEvent.object_versions.delete()   
-                responseValue = 120
-                responseData = {}
-                responseData['Data'] = responseValue
-                cfnresponse.send(event, context, cfnresponse.SUCCESS, 
-                  responseData, 'scm-cfn-customresource-id')  
+              responseValue = 120
+              responseData = {}
+              responseData['Data'] = responseValue
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, 
+                responseData, 'scm-cfn-customresource-id')
             except Exception as e:
               print(e)
               responseValue = 120
@@ -665,4 +702,19 @@ Resources:
       ServiceToken:
         Fn::GetAtt:
           - PreInstalledModelLambda
+          - Arn
+  InvokeDeleteS3:
+    Type: AWS::CloudFormation::CustomResource
+    Version: '1.0'
+    DependsOn:
+      - S3BucketEventCreation
+      - S3BucketModelCreation
+      - S3BucketPanoramaAppCreation
+      - S3BucketExportEventCreation
+      - S3BucketModelPretrainCreation
+      - S3BucketModelRetrainCreation
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - DeleteS3Lambda
           - Arn
