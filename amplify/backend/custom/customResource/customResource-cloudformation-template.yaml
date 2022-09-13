@@ -273,6 +273,9 @@ Resources:
                   - dynamodb:*
                   - ssm:*
                   - codebuild:*
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
                 Resource: '*'
   CodeBuildRole:
     Type: AWS::IAM::Role
@@ -378,6 +381,11 @@ Resources:
           import cfnresponse
           import os
 
+          def bucket_exist(bucketName, buckets):
+            for bucket in buckets:
+                if bucket['Name'] == bucketName:
+                    return True
+            return False
           def handler(event, context):
             try:
               random_p = boto3.client("ssm").get_parameter(Name="/ppe/random/" + os.environ["ENV"])["Parameter"]["Value"]
@@ -389,7 +397,11 @@ Resources:
                       "value": "s3://pretraininput-" + random_p,
                     },
                     {
-                      "name":"REGION"
+                      "name":"APP_BUCKET",
+                      "value": "s3://panorama-app-" + random_p
+                    },
+                    {
+                      "name":"REGION",
                       "value": os.environ["REGION"]
                     }
                 ]
@@ -408,27 +420,38 @@ Resources:
                     "build_id": build_id,
                 }
               elif event['RequestType'] == 'Delete':
-                s3_client = boto3.resource('s3')
-                pretrain = s3_client.Bucket('pretraininput-' + random_p)
-                pretrain.object_versions.delete()
+                s3_client = boto3.client('s3')
+                s3_resource = boto3.resource('s3')
                 
-                retrain = s3_client.Bucket('retrainoutput-' + random_p)
-                retrain.object_versions.delete()
+                buckets = s3_client.list_buckets()['Buckets']
+                print(buckets)
+                if(bucket_exist('pretraininput-' + random_p, buckets)):
+                    pretrain = s3_resource.Bucket('pretraininput-' + random_p)
+                    pretrain.object_versions.delete()
+
+                if(bucket_exist('retrainoutput-' + random_p, buckets)):
+                    retrain = s3_resource.Bucket('retrainoutput-' + random_p)
+                    retrain.object_versions.delete()
+                if(bucket_exist('panorama-app-' + random_p, buckets)):
+                    panoramaApp = s3_resource.Bucket('panorama-app-' + random_p)
+                    panoramaApp.object_versions.delete()
                 
-                panoramaApp = s3_client.Bucket('panorama-app-' + random_p)
-                panoramaApp.object_versions.delete()
-                
-                appGraph = s3_client.Bucket('app-graph-' + random_p)
-                appGraph.object_versions.delete()
-                
-                eventBucket = s3_client.Bucket('event-' + random_p)
-                eventBucket.object_versions.delete()
-                
-                exportEvent = s3_client.Bucket('export-event-' + random_p)
-                exportEvent.object_versions.delete()    
+                if(bucket_exist('app-graph-' + random_p, buckets)):
+                    appGraph = s3_resource.Bucket('app-graph-' + random_p)
+                    appGraph.object_versions.delete()
+                if(bucket_exist('event-' + random_p, buckets)):
+                    eventBucket = s3_resource.Bucket('event-' + random_p)
+                    eventBucket.object_versions.delete()
+                if(bucket_exist('export-event-'+ random_p, buckets)):
+                    exportEvent = s3_resource.Bucket('export-event-' + random_p)
+                    exportEvent.object_versions.delete()   
+                responseValue = 120
+                responseData = {}
+                responseData['Data'] = responseValue
                 cfnresponse.send(event, context, cfnresponse.SUCCESS, 
-                  responseData, 'scm-cfn-customresource-id')     
-            except:
+                  responseData, 'scm-cfn-customresource-id')  
+            except Exception as e:
+              print(e)
               responseValue = 120
               responseData = {}
               responseData['Data'] = responseValue
@@ -636,7 +659,6 @@ Resources:
     Type: AWS::CloudFormation::CustomResource
     Version: '1.0'
     DependsOn:
-      - ModelStateMachine
       - PreinstalledPanoramaModel
       - PreInstalledModelLambda
     Properties:

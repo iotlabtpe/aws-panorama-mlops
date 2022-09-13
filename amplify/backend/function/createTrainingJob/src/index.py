@@ -46,7 +46,7 @@ def handler(event, context):
         # Need to get the AWS account id
         account_id = boto3.client("sts").get_caller_identity()["Account"]
         print(account_id)
-        training_image = account_id + ".dkr.ecr.ap-southeast-1.amazonaws.com/gary-yolov5-train:latest"
+        training_image = account_id + ".dkr.ecr." + os.environ['REGION'] + ".amazonaws.com/gary-yolov5-train:latest"
 
         # training_image = event['training_image'] // specify the training_image from the account
 

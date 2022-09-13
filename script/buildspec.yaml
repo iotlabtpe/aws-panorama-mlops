@@ -14,6 +14,10 @@ phases:
       - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
       - cd script
       - aws s3 cp training-input/ $PRETRAIN_BUCKET --recursive
+      - cd ..
+      - cd deployment
+      - zip ppe_panorama_app ppe_panorama_app 
+      - aws s3 cp ppe_panorama.zip $APP_BUCKET
       - bash matlab_pull_and_push.sh $REGION 
       - bash yolov5_pull_and_push.sh $REGION 
 
