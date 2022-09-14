@@ -17,6 +17,7 @@ phases:
       - cd ..
       - cd deployment
       - zip ppe_panorama_app ppe_panorama_app 
+      - ls
       - aws s3 cp ppe_panorama.zip $APP_BUCKET
       - bash matlab_pull_and_push.sh $REGION 
       - bash yolov5_pull_and_push.sh $REGION 
