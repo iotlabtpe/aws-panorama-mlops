@@ -10,6 +10,7 @@ phases:
   build:
     commands: # TODO: download from S3 and upload to S3, rmb to grant S3 access to IAM.
       - echo $PRETRAIN_BUCKET 
+      - echo $APP_BUCKET 
       - echo $REGION
       - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
       - cd script
@@ -18,7 +19,7 @@ phases:
       - cd deployment
       - zip ppe_panorama_app ppe_panorama_app 
       - ls
-      - aws s3 cp ppe_panorama.zip $APP_BUCKET
+      - aws s3 cp ppe_panorama_app.zip $APP_BUCKET
       - bash matlab_pull_and_push.sh $REGION 
       - bash yolov5_pull_and_push.sh $REGION 
 
