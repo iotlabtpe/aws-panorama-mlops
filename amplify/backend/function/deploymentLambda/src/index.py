@@ -14,7 +14,7 @@ override_camera_template = {
 
 
 arn_role = boto3.client("ssm").get_parameter(Name="/ppe/config/arn/" + os.environ["ENV"])["Parameter"]["Value"]
-env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])["Parameter"]["Value"]
+env_p = os.environ["ENV"]
 
 # Hack to print to stderr so it appears in CloudWatch.
 def eprint(*args, **kwargs):
@@ -51,6 +51,17 @@ def post(event, account_id):
     # Override env node into Panorama Application
     override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_env", "interface": "string", "value": env_p})
     override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "environment_variable", "with": [{"name": "my_env"}]})
+
+    override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_region", "interface": "string", "value": os.environ["REGION"]})
+    override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "region_variable", "with": [{"name": "my_region"}]})
+
+    override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_deviceId", "interface": "string", "value": body['deviceId']})
+    override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "deviceId_variable", "with": [{"name": "my_deviceId"}]})
+
+    override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_cameraId", "interface": "string", "value": cameras[0]})
+    override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "cameraId_variable", "with": [{"name": "my_cameraId"}]})
+
+
     # Use targerArn for S3 bucket to download graph.json
     bucket, key = body["targetArn"].split("/", 2)[-1].split("/", 1)
     eprint({bucket, key})

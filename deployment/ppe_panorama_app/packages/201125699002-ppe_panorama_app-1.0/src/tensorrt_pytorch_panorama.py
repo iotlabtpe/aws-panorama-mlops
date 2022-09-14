@@ -53,13 +53,13 @@ class ObjectDetectionApp(p.node):
         )
 
         # For PPE portal, IoT event report and camera monitoring. Hard code for demonstration.
-        self.bucket = "event-cd14bfe0-1231-11ed-b64e-06ca11bc4d14"
-        self.device_id = "device-edathpmcmq6itrwh72dhuu6kkq"
-        self.camera_id = "demo-camera-1.0-a07451ac-demo-camera"
 
         self.env = self.inputs.env.get()
+        self.region = self.inputs.region.get()
+        self.deviceId = self.inputs.deviceId.get()
+        self.cameraId = self.inputs.cameraId.get()
         self.ppe_iot_handler = PpeIot(
-            self.bucket, self.device_id, self.camera_id, self.env
+            self.env, self.region, self.deviceId, self.cameraId 
         )
 
         self.cordon_area = [(0.1, 0.2, 0.3, 0.7), (0.3, 0.2, 0.5, 0.7)]

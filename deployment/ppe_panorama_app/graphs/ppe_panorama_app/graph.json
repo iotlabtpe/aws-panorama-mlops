@@ -46,7 +46,35 @@
                     "title": "environment variable for ppe",
                     "description": "Let the application know where to send the file via the environment"
                 }
+            },
+            {
+                "name": "region_variable",
+                "interface": "string",
+                "overridable": true,
+                "decorator": {
+                    "title": "region variable for ppe",
+                    "description": "Let the application know where to send the file via the environment"
+                }
+            },
+            {
+                "name": "deviceId_variable",
+                "interface": "string",
+                "overridable": true,
+                "decorator": {
+                    "title": "deviceId variable for ppe",
+                    "description": "Let the application know where to send the file via the environment"
+                }
+            },
+            {
+                "name": "cameraId_variable",
+                "interface": "string",
+                "overridable": true,
+                "decorator": {
+                    "title": "cameraId variable for ppe",
+                    "description": "Let the application know where to send the file via the environment"
+                }
             }
+
         ],
         "edges": [
             {
@@ -60,6 +88,18 @@
             {
                 "producer": "environment_variable",
                 "consumer": "ppe_panorama_app_node.env"
+            },
+            {
+                "producer": "region_variable",
+                "consumer": "ppe_panorama_app_node.region"
+            },
+            {
+                "producer": "deviceId_variable",
+                "consumer": "ppe_panorama_app_node.deviceId"
+            },
+            {
+                "producer": "cameraId_variable",
+                "consumer": "ppe_panorama_app_node.cameraId"
             }
         ]
     }

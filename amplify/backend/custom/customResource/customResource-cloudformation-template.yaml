@@ -331,7 +331,7 @@ Resources:
         Image: aws/codebuild/standard:5.0
         PrivilegedMode: 'true'
       Source:
-        BuildSpec: deployment/buildspec.yaml
+        BuildSpec: deployment/buildspec_s3.yaml
         Location: https://github.com/hardco2020/aws-panorama-mlops.git
         Type: GITHUB
   PreinstalledPanoramaModel:

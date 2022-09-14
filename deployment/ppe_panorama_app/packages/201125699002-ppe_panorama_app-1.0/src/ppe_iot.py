@@ -25,12 +25,15 @@ from multiprocessing import Process
 log = logging.getLogger("my_logger")
 
 
-def ppe_handler(image_to_send, cor_data, env):
-    iot_client = boto3.client("iot-data", region_name="ap-southeast-1")
-    s3_client = boto3.resource("s3", region_name="ap-southeast-1")
+def ppe_handler(image_to_send, cor_data, env, region, deviceId, cameraId):
+    log.info("deviceId",deviceId)
+    log.info("camearId",cameraId)
+    log.info("region",region)
+    iot_client = boto3.client("iot-data", region_name=region)
+    s3_client = boto3.resource("s3", region_name=region)
     sql_command = "/ppe/random/" + env
     log.info("sql_command", sql_command)
-    random_p = boto3.client("ssm", region_name="ap-southeast-1").get_parameter(Name=sql_command)
+    random_p = boto3.client("ssm", region_name=region).get_parameter(Name=sql_command)
     prefix = "ppe"
     # device_id = 'cf2533b6-2541-4347-a68c-404742578e14'
     # camera_id = 'cf2533b6-2541-4347-a68c-404742578e14'
@@ -38,12 +41,10 @@ def ppe_handler(image_to_send, cor_data, env):
     bucket = "event-" + random_p["Parameter"]["Value"]
     log.info("bucket", bucket)
     log.info("env", env)
-    device_id = "device-edathpmcmq6itrwh72dhuu6kkq"
-    camera_id = "demo-camera-1.0-a07451ac-demo-camera"
 
-    picture_path = prefix + "/images/" + device_id + "/"
+    picture_path = prefix + "/images/" + deviceId + "/"
     s3_picture = "s3://" + bucket + "/" + picture_path
-    label_path = prefix + "/labels/" + device_id + "/"
+    label_path = prefix + "/labels/" + deviceId + "/"
     s3_label = "s3://" + bucket + "/" + label_path
 
     event_data = {}
@@ -57,8 +58,8 @@ def ppe_handler(image_to_send, cor_data, env):
     file_name_prefix = eventDate.strftime("%Y%m%d%H%M%S")
     event_data["time"] = eventDate.strftime("%Y-%m-%d %H:%M:%S")
     event_data["location"] = "TPE"
-    event_data["device_id"] = device_id
-    event_data["CameraID"] = camera_id
+    event_data["device_id"] = deviceId
+    event_data["CameraID"] = cameraId
     event_data["status"] = "unresolve"
     event_data["name"] = "Cordon Line Event"
     event_data["flag"] = "Cordon Line Detecting"
@@ -130,17 +131,12 @@ def cordon_area_detection(payload_obj):
 
 
 class PpeIot:
-    def __init__(self, bucket, device_id, camera_id, env):
-        self.bucket = bucket
-        self.device_id = device_id
-        self.camera_id = camera_id
-        self.env = env
-        self.prefix = "ppe"
-        self.picture_path = self.prefix + "/images/" + self.device_id + "/"
-        self.s3_picture = "s3://" + self.bucket + "/" + self.picture_path
-        self.label_path = self.prefix + "/labels/" + self.device_id + "/"
-        self.s3_label = "s3://" + self.bucket + "/" + self.label_path
+    def __init__(self, env, region, deviceId, cameraId ):
 
+        self.env = env
+        self.region = region
+        self.deviceId = deviceId
+        self.cameraId = cameraId
         self.num_camera = 100
         self.is_detect = {}
 
@@ -221,6 +217,6 @@ class PpeIot:
         # if is_overlap :
         log.info(">>>>>>Processing")
         log.info("People detected from camera: " + stream_id)
-        ppe_handler(image_raw, compareData, self.env)
+        ppe_handler(image_raw, compareData, self.env, self.region, self.deviceId, self.cameraId)
         log.info("<<<<<<End of processing")
         # self.is_detect[stream_id] = True
