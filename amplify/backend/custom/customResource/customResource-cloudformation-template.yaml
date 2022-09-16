@@ -235,14 +235,25 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - ec2:*
-                  - ecr:*
-                  - ecs:*
                   - s3:*
                   - lambda:*
                   - dynamodb:*
                   - ssm:*
+                  - events:PutTargets
+                  - events:PutRule
+                  - events:DescribeRule
+                  - sagemaker:*
+                  - codebuild:*
                 Resource: '*'
+              - Effect: Allow
+                Action: 
+                  - iam:PassRole
+                Resource: 
+                  Fn::Join:
+                    - ''
+                    - - 'arn:aws:iam::'
+                      - Ref: AWS::AccountId
+                      - ':role/amplify-*'
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -507,114 +518,215 @@ Resources:
           - '-'
           - - Retrain
             - Ref: env
-      DefinitionString:
-        Fn::Sub:
-          - |
+      DefinitionString: |-
             {
-              "StartAt": "StartTrainingJob",
+              "StartAt": "SageMaker CreateTrainingJob",
               "States": {
-                "StartTrainingJob": {
+                "SageMaker CreateTrainingJob": {
                   "Type": "Task",
-                  "Resource": "arn:aws:states:::lambda:invoke",
-                  "OutputPath": "$.Payload",
+                  "Resource": "arn:aws:states:::sagemaker:createTrainingJob",
                   "Parameters": {
-                    "Payload.$": "$",
-                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:createTrainingJob-${Env}:$LATEST"
+                    "AlgorithmSpecification": {
+                      "EnableSageMakerMetricsTimeSeries": true,
+                      "TrainingImage.$": "$.TrainingImage",
+                      "TrainingInputMode": "File"
+                    },
+                    "EnableInterContainerTrafficEncryption": false,
+                    "EnableManagedSpotTraining": false,
+                    "EnableNetworkIsolation": false,
+                    "HyperParameters": {
+                      "GRAPH_S3.$": "$.GRAPH_S3"
+                    },
+                    "InputDataConfig": [
+                      {
+                        "ChannelName": "cfg",
+                        "DataSource": {
+                          "S3DataSource": {
+                            "S3DataDistributionType": "FullyReplicated",
+                            "S3DataType": "S3Prefix",
+                            "S3Uri.$": "$.cfgS3Uri"
+                          }
+                        }
+                      },
+                      {
+                        "ChannelName": "weights",
+                        "DataSource": {
+                          "S3DataSource": {
+                            "S3DataDistributionType": "FullyReplicated",
+                            "S3DataType": "S3Prefix",
+                            "S3Uri.$": "$.weightsS3Uri"
+                          }
+                        }
+                      },
+                      {
+                        "ChannelName": "images",
+                        "DataSource": {
+                          "S3DataSource": {
+                            "S3DataDistributionType": "FullyReplicated",
+                            "S3DataType": "S3Prefix",
+                            "S3Uri.$": "$.imagesS3Uri"
+                          }
+                        }
+                      },
+                      {
+                        "ChannelName": "labels",
+                        "DataSource": {
+                          "S3DataSource": {
+                            "S3DataDistributionType": "FullyReplicated",
+                            "S3DataType": "S3Prefix",
+                            "S3Uri.$": "$.labelsS3Uri"
+                          }
+                        }
+                      }
+                    ],
+                    "OutputDataConfig": {
+                      "S3OutputPath.$": "$.output_s3uri"
+                    },
+                    "ResourceConfig": {
+                      "InstanceCount": 1,
+                      "InstanceType.$": "$.instance_type",
+                      "VolumeSizeInGB": 30
+                    },
+                    "RoleArn.$": "$.role_arn",
+                    "StoppingCondition": {
+                      "MaxRuntimeInSeconds": 86400
+                    },
+                    "TrainingJobName.$": "$.model_name"
                   },
-                  "Retry": [
-                    {
-                      "ErrorEquals": [
-                        "Lambda.ServiceException",
-                        "Lambda.AWSLambdaException",
-                        "Lambda.SdkClientException"
-                      ],
-                      "IntervalSeconds": 2,
-                      "MaxAttempts": 6,
-                      "BackoffRate": 2
-                    }
-                  ],
-                  "Next": "CheckTrainingJobStatus"
+                  "Next": "DynamoDB PutItem",
+                  "ResultPath": null,
+                  "ResultSelector": {
+                    "model_name": "$.Payload.model_name",
+                    "table_name": "$.Payload.table_name",
+                    "project_name": "$.Payload.project_name",
+                    "app_s3_uri": "$.Payload.app_s3_uri",
+                    "GRAPH_S3": "$.Payload.GRAPH_S3",
+                    "app_name_zip": "$.Payload.app_name_zip"
+                  }
                 },
-                "CheckTrainingJobStatus": {
+                "DynamoDB PutItem": {
                   "Type": "Task",
-                  "Resource": "arn:aws:states:::lambda:invoke",
-                  "OutputPath": "$.Payload",
+                  "Resource": "arn:aws:states:::dynamodb:putItem",
                   "Parameters": {
-                    "Payload.$": "$",
-                    "FunctionName":"arn:aws:lambda:${Region}:${AccountId}:function:checkTrainingJobStatus-${Env}:$LATEST"
-                  },
-                  "Retry": [
-                    {
-                      "ErrorEquals": [
-                        "Lambda.ServiceException",
-                        "Lambda.AWSLambdaException",
-                        "Lambda.SdkClientException"
-                      ],
-                      "IntervalSeconds": 2,
-                      "MaxAttempts": 6,
-                      "BackoffRate": 2
+                    "TableName.$": "$.table_name",
+                    "Item": {
+                      "model_name": {
+                        "S.$": "$.model_name"
+                      },
+                      "stage": {
+                        "S": "training_job"
+                      }
                     }
-                  ],
-                  "Next": "BranchTrainingJobStatus"
+                  },
+                  "Next": "DescribeTrainingJob",
+                  "ResultPath": null
                 },
-                "BranchTrainingJobStatus": {
+                "DescribeTrainingJob": {
+                  "Type": "Task",
+                  "Next": "Choice",
+                  "Parameters": {
+                    "TrainingJobName.$": "$.model_name"
+                  },
+                  "Resource": "arn:aws:states:::aws-sdk:sagemaker:describeTrainingJob",
+                  "ResultPath": "$.training"
+                },
+                "Choice": {
                   "Type": "Choice",
                   "Choices": [
                     {
-                      "Variable": "$.status",
-                      "StringEquals": "Completed",
-                      "Next": "InvokeCodeBuild"
+                      "Variable": "$.training.TrainingJobStatus",
+                      "StringEquals": "InProgress",
+                      "Next": "Wait"
                     },
                     {
-                      "Variable": "$.status",
-                      "StringEquals": "InProgress",
-                      "Next": "WaitTrainingJob"
+                      "Variable": "$.training.TrainingJobStatus",
+                      "StringEquals": "Completed",
+                      "Next": "DynamoDB UpdateItem"
                     }
                   ],
-                  "Default": "Fail"
+                  "Default": "Fail",
+                  "Comment": "if it's "
                 },
-                "InvokeCodeBuild": {
-                  "Type": "Task",
-                  "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-                  "Parameters": {
-                    "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:triggerCodeBuild-${Env}:$LATEST",
-                    "Payload": {
-                      "token.$": "$$.Task.Token",
-                      "otherInput.$": "$"
-                    }
-                  },
-                  "Retry": [
-                    {
-                      "ErrorEquals": [
-                        "Lambda.ServiceException",
-                        "Lambda.AWSLambdaException",
-                        "Lambda.SdkClientException"
-                      ],
-                      "IntervalSeconds": 2,
-                      "MaxAttempts": 6,
-                      "BackoffRate": 2
-                    }
-                  ],
-                  "End": true,
-                  "ResultPath": null
-                },
-                "WaitTrainingJob": {
+                "Wait": {
                   "Type": "Wait",
                   "Seconds": 10,
-                  "Next": "CheckTrainingJobStatus"
+                  "Next": "DescribeTrainingJob"
                 },
                 "Fail": {
                   "Type": "Fail"
+                },
+                "DynamoDB UpdateItem": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::dynamodb:updateItem",
+                  "Parameters": {
+                    "TableName.$": "$.table_name",
+                    "Key": {
+                      "model_name": {
+                        "S.$": "$.model_name"
+                      }
+                    },
+                    "UpdateExpression": "SET trainingJobStatus = :val, trainingJobModelDataUrl = :val2, trainingJobStartTime = :val3, trainingJobEndTime = :val4",
+                    "ExpressionAttributeValues": {
+                      ":val": {
+                        "S.$": "$.training.TrainingJobStatus"
+                      },
+                      ":val2": {
+                        "S.$": "$.training.ModelArtifacts.S3ModelArtifacts"
+                      },
+                      ":val3": {
+                        "S.$": "$.training.TrainingStartTime"
+                      },
+                      ":val4": {
+                        "S.$": "$.training.TrainingEndTime"
+                      }
+                    },
+                    "ReturnValues": "UPDATED_NEW"
+                  },
+                  "Next": "CodeBuild StartBuild",
+                  "ResultPath": null
+                },
+                "CodeBuild StartBuild": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::codebuild:startBuild.sync",
+                  "Parameters": {
+                    "ProjectName.$": "$.project_name",
+                    "EnvironmentVariablesOverride": [
+                      {
+                        "Name": "MODEL_S3",
+                        "Value.$": "$.training.ModelArtifacts.S3ModelArtifacts",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "MODEL_NAME",
+                        "Value.$": "$.training.TrainingJobName",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "DB_TABLE_NAME",
+                        "Value.$": "$.table_name",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "GRAPH_S3",
+                        "Value.$": "$.GRAPH_S3",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "APP_S3_Uri",
+                        "Value.$": "$.app_s3_uri",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "APP_Name",
+                        "Value.$": "$.app_name",
+                        "Type": "PLAINTEXT"
+                      }
+                    ]
+                  },
+                  "End": true
                 }
               }
             }
-          - AccountId:
-              Ref: AWS::AccountId
-            Env:
-              Ref: env
-            Region:
-              Ref: AWS::Region
-            Resource: arn:aws-cn:states:::lambda:invoke
       RoleArn:
         Fn::GetAtt:
           - StateMachineRole

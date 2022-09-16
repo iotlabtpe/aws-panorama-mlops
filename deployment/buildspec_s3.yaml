@@ -44,7 +44,7 @@ phases:
           --expression-attribute-values '{
             ":url": {"S": "'$GRAPH_S3'"}
           }'
-      - aws stepfunctions send-task-success --task-token $TASK_TOKEN --task-output {}
+      # - aws stepfunctions send-task-success --task-token $TASK_TOKEN --task-output {}
   post_build:
     commands:
       - echo Build completed on `date`
