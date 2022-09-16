@@ -26,21 +26,21 @@ log = logging.getLogger("my_logger")
 
 
 def ppe_handler(image_to_send, cor_data, env, region, deviceId, cameraId):
-    log.info("deviceId",deviceId)
-    log.info("camearId",cameraId)
-    log.info("region",region)
+    # log.info("deviceId + " deviceId)
+    # log.info("camearId",cameraId)
+    # log.info("region",region)
     iot_client = boto3.client("iot-data", region_name=region)
     s3_client = boto3.resource("s3", region_name=region)
     sql_command = "/ppe/random/" + env
-    log.info("sql_command", sql_command)
+    # log.info("sql_command", sql_command)
     random_p = boto3.client("ssm", region_name=region).get_parameter(Name=sql_command)
     prefix = "ppe"
     # device_id = 'cf2533b6-2541-4347-a68c-404742578e14'
     # camera_id = 'cf2533b6-2541-4347-a68c-404742578e14'
     # bucket = 'auo-ppe-v2-event-bucket-20220428'
     bucket = "event-" + random_p["Parameter"]["Value"]
-    log.info("bucket", bucket)
-    log.info("env", env)
+    # log.info("bucket", bucket)
+    # log.info("env", env)
 
     picture_path = prefix + "/images/" + deviceId + "/"
     s3_picture = "s3://" + bucket + "/" + picture_path

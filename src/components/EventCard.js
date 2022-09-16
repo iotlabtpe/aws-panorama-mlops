@@ -109,7 +109,7 @@ class  ImgCard extends React.Component {
             {value:'mask',label:'口罩'},
             {value:'helmet',label:'安全帽'}
         ],
-        tagSelectedOption:{name:'口罩',value:'mask'},
+        tagSelectedOption:{name:'口罩',value:'person'},
 
         pageOptions:[
             {value:'1',label:'1'},
@@ -292,6 +292,7 @@ onTagChange(e){
     var _name = ''
     if (!e.target.name){
         const _select = this.state.tagOptions.find(r => r.value === e.target.value);
+        console.log("Select",_select)
         if (_select) {
             _name = _select.label
         }
@@ -384,16 +385,8 @@ btn_next(){
 
     return(
         <Grid container>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
                 <Inline>   
-                    {/* <KeyValuePair label="Job_id:"></KeyValuePair>
-                    <Select placeholder={'Choose job'} 
-                        statusType={this.state.job_loading} 
-                        loadingText="Loading job list" 
-                        options={jobOptions}
-                        selectedOption={jobSelectedOption}
-                        onChange={this.onJobChange}
-                    /> */}
                     <KeyValuePair label="Status:"></KeyValuePair>
                     <Select placeholder={'Choose an image status'} 
                         options={statusOptions}
@@ -401,23 +394,11 @@ btn_next(){
                         onChange={this.onStatusChange}
                     />
                     <KeyValuePair label="Tag:"></KeyValuePair>
-                    {/* <Select placeholder={'Choose an bot tag'} 
-                        options={tagOptions}
-                        selectedOption={tagSelectedOption}
-                        onChange={this.onTagChange}
-                    /> */}
-                    {/* <Translation> */}
                         <Select placeholder={'Choose an bot tag'} 
                             options={[{value:'mask',label:t('mask')},{value:'helmet',label:t('helmet')},{value:'person',label:t('person')}]}
                             selectedOption={tagSelectedOption}
                             onChange={this.onTagChange}
                         />
-                    {/* </Translation> */}
-
-                {/* </Inline>
-            </Grid>
-            <Grid item xs={12}>
-                <Inline>    */}
                     <KeyValuePair label="Page_Size:"></KeyValuePair>
                     <Select placeholder={'Choose page size'} 
                         options={pageOptions}
@@ -432,7 +413,7 @@ btn_next(){
                     {'/'}
                     <Badge content={total_pages} color="blue" />
                 </Inline>  
-            </Grid>
+            </Grid> */}
             <Grid item xs={12}>
                 <Inline>   
                     {this.renderBBox()}

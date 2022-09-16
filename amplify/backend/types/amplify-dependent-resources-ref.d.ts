@@ -18,24 +18,6 @@ export type AmplifyDependentResourcesAttributes = {
             "Region": "string",
             "LambdaExecutionRole": "string"
         },
-        "createTrainingJob": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string"
-        },
-        "checkTrainingJobStatus": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string"
-        },
-        "triggerCodeBuild": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string"
-        },
         "listModel": {
             "Name": "string",
             "Arn": "string",
@@ -49,12 +31,6 @@ export type AmplifyDependentResourcesAttributes = {
             "LambdaExecutionRole": "string"
         },
         "deploymentLambda": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string"
-        },
-        "uploadMetricsToS3": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
@@ -107,14 +83,6 @@ export type AmplifyDependentResourcesAttributes = {
             "Region": "string"
         },
         "Device": {
-            "Name": "string",
-            "Arn": "string",
-            "StreamArn": "string",
-            "PartitionKeyName": "string",
-            "PartitionKeyType": "string",
-            "Region": "string"
-        },
-        "ppaModel": {
             "Name": "string",
             "Arn": "string",
             "StreamArn": "string",

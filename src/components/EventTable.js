@@ -99,7 +99,8 @@ class  EventTable extends React.Component {
         loading : true ,
         job_list : [],
         curent : null,
-        curent_id:[]
+        curent_id:[],
+        lastKey: {}
 
     }
   }
@@ -113,6 +114,8 @@ class  EventTable extends React.Component {
 
 
   async load_data(){
+    const payload = {}
+    const HEADERS = {'Content-Type': 'application/json'};
     await API.get('backend','/event').then(res => {
         console.log(res)
         if (res){
@@ -121,11 +124,12 @@ class  EventTable extends React.Component {
             res.forEach((item)=>{
                 var _tmp = {}
 
-                _tmp['key'] = item['key']
+                _tmp['camera_id'] = item["CameraID"]
+                _tmp['timestamp'] = item["TimeStamp"]
                 _tmp['device_id'] = item['device_id']
                 _tmp['flag'] = item['flag']
                 _tmp['label_filename'] = item['label_filename']
-                _tmp['picture_filename'] = item['picture_filename']
+                _tmp['picture_filename'] = item['picture_filename'] 
                 _tmp['video_filename'] = item['video_filename']
                 _tmp['location'] = item['location']
                 _tmp['name'] = item['name']
@@ -138,7 +142,9 @@ class  EventTable extends React.Component {
                 
                 _tmp_data.push(_tmp)
             });
-
+            // if('LastEvaluatedKey' in res){
+            //     this.setState({lastKey: res['LastEvaluatedKey']})
+            // }
             var c_id = []
             if(_tmp_data[0]) {
                 c_id = [_tmp_data[0]['id']]
@@ -165,7 +171,10 @@ class  EventTable extends React.Component {
 
   getRowId(data){
     console.log(data)
-    return data?data.id:[]
+    return data?data.time:[]
+  }
+  handleFetchData(){
+    console.log('test');
   }
 
 
@@ -179,7 +188,7 @@ class  EventTable extends React.Component {
         <Inline>
         </Inline>
     );
-
+    
     return(
         <Container headingVariant="h4">
           <Grid container>
@@ -194,10 +203,10 @@ class  EventTable extends React.Component {
                     columnDefinitions={columnDefinitions}
                     items={this.state.job_list}
                     onSelectionChange={(item)=>{this.change_select(item)}}
+                    // getRowId={this.getRowId}
                     getRowId={this.getRowId}
                     loading={this.state.loading}
-                    disableSettings={false}
-                    selectedRowIds={this.state.curent_id}
+                    // selectedRowIds={this.state.curent_id}
                 />
                                             </Grid>  
                             <Grid item xs={1}></Grid>

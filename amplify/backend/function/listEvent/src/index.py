@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 import os
 
-env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])["Parameter"]["Value"]
+env_p = os.environ["ENV"]
 # DB
 TABLE_NAME = "Event-" + env_p
 db = boto3.resource("dynamodb")
@@ -21,67 +21,95 @@ table = db.Table(TABLE_NAME)
 s3 = boto3.client("s3")
 
 
+def processData(item):
+    good = {}
+    good["CameraID"] = item["CameraID"]
+    good["TimeStamp"] = int(item["TimeStamp"])
+    good["label_filename"] = "defaultTest"
+    if item["payload"]["label_filename"]:
+        good["label_filename"] = item["payload"]["label_filename"]
+    good["picture_filename"] = item["payload"]["picture_filename"]
+    good["video_filename"] = item["payload"]["video_filename"]
+    good["name"] = item["payload"]["name"]
+    good["type"] = item["payload"]["type"]
+
+    print(item["payload"]["time"])
+    good["time"] = item["payload"]["time"]
+    good["flag"] = item["payload"]["flag"]
+    good["location"] = item["payload"]["location"]
+    good["device_id"] = item["payload"]["device_id"]
+    good["picture"] = get_presigned_url(item["payload"]["picture"])
+    if len(item["payload"]["video"]) > 0:
+        good["video"] = get_presigned_url(item["payload"]["video"])
+    if len(item["payload"]["label"]) > 0:
+        good["label"] = get_presigned_url(item["payload"]["label"])
+    if "acknowledged" in item["payload"]:
+        good["acknowledged"] = item["payload"]["acknowledged"]
+    if "manual_modified" in item["payload"]:
+        good["manual_modified"] = item["payload"]["manual_modified"]
+    if "ack_bbox_mask" in item["payload"]:
+        box_group = []
+        for box in item["payload"]["ack_bbox_mask"]:
+            new_box = []
+            for line in box:
+                new_box.append(str(line))
+            box_group.append(new_box)
+        good["ack_bbox_mask"] = box_group
+    good["origin_picture"] = get_presigned_url(item["payload"]["origin_picture"])
+    return good
+
 def handler(event, context):
     # TODO implement
     try:
         if event["httpMethod"] == "GET":
-            response = table.query(
-                KeyConditionExpression=Key("CameraID").eq("demo-camera-1.0-a07451ac-demo-camera"),
-                ScanIndexForward=False,
-            )
+            print(event)
+            results = []
+            response = table.scan()
+            datas = response['Items']
+            while 'LastEvaluatedKey' in response:
+                response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+                datas.update(response['Items'])
+            for data in datas:
+                good = processData(data)
+                results.append(good)
+            body = results
+
+        # The way to process data on every request 
+        if event["httpMethod"] == "POST":
+            print(event)
+            body = {}
+            if 'LastEvaluatedKey' in event['body']:
+                print('page')
+                response = table.scan(
+                    Limit=10,
+                    ExclusiveStartKey=event['body']['LastEvaluatedKey']
+                )
+                if 'LastEvaluatedKey' in response:
+                    body['LastEvaluatedKey'] = response['LastEvaluatedKey']
+            else:
+                print('first page')
+                response = table.scan(Limit=10)
+                if 'LastEvaluatedKey' in response:
+                    response['LastEvaluatedKey']['TimeStamp'] = int(response['LastEvaluatedKey']['TimeStamp'])
+                    body['LastEvaluatedKey'] = response['LastEvaluatedKey']
             results = []
             print(response)
             for item in response["Items"]:
-
-                good = {}
-                good["CameraID"] = item["CameraID"]
-                good["TimeStamp"] = int(item["TimeStamp"])
-                good["label_filename"] = "defaultTest"
-                if item["payload"]["label_filename"]:
-                    good["label_filename"] = item["payload"]["label_filename"]
-                good["picture_filename"] = item["payload"]["picture_filename"]
-                good["video_filename"] = item["payload"]["video_filename"]
-                good["name"] = item["payload"]["name"]
-                good["type"] = item["payload"]["type"]
-
-                print(item["payload"]["time"])
-                good["time"] = item["payload"]["time"]
-                good["flag"] = item["payload"]["flag"]
-                good["location"] = item["payload"]["location"]
-                good["device_id"] = item["payload"]["device_id"]
-                good["picture"] = get_presigned_url(item["payload"]["picture"])
-                if len(item["payload"]["video"]) > 0:
-                    good["video"] = get_presigned_url(item["payload"]["video"])
-                if len(item["payload"]["label"]) > 0:
-                    good["label"] = get_presigned_url(item["payload"]["label"])
-                if "acknowledged" in item["payload"]:
-                    good["acknowledged"] = item["payload"]["acknowledged"]
-                if "manual_modified" in item["payload"]:
-                    good["manual_modified"] = item["payload"]["manual_modified"]
-                if "ack_bbox_mask" in item["payload"]:
-                    box_group = []
-                    for box in item["payload"]["ack_bbox_mask"]:
-                        new_box = []
-                        for line in box:
-                            new_box.append(str(line))
-                        box_group.append(new_box)
-                    good["ack_bbox_mask"] = box_group
-                good["origin_picture"] = get_presigned_url(item["payload"]["origin_picture"])
-
+                good = processData(item)
                 results.append(good)
-            body = json.dumps(results)
-        elif event["httpMethod"] == "POST":
-            print(event["body"])
-            table.update_item(
-                Key={"CameraID": body["CameraID"], "TimeStamp": body["TimeStamp"]},
-                UpdateExpression="set payload = :val",
-                ExpressionAttributeValues={":val": body},
-                ReturnValues="UPDATED_NEW",
-            )
-            body = json.dumps("Update Successful")
+            body['Items'] = results
+        # elif event["httpMethod"] == "POST":
+        #     print(event["body"])
+        #     table.update_item(
+        #         Key={"CameraID": body["CameraID"], "TimeStamp": body["TimeStamp"]},
+        #         UpdateExpression="set payload = :val",
+        #         ExpressionAttributeValues={":val": body},
+        #         ReturnValues="UPDATED_NEW",
+        #     )
+        #     body = json.dumps("Update Successful")
         return {
             "statusCode": 200,
-            "body": body,
+            "body": json.dumps(body),
             "headers": {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
@@ -105,9 +133,7 @@ def handler(event, context):
 def get_presigned_url(s3uri):
     first = s3uri.find("/", 5)
     # bucket = bucket=s3uri[5 : first]
-    print(s3uri)
     bucket = s3uri[5:first]
-    print(bucket)
 
     file_key = s3uri[first + 1 :]
     try:
@@ -116,7 +142,6 @@ def get_presigned_url(s3uri):
             Params={"Bucket": bucket, "Key": file_key},
             ExpiresIn=1000,
         )
-        print("Got presigned URL: {}".format(url))
     except ClientError:
         print("Couldn't get a presigned URL for client method ")
         raise

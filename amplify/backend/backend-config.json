@@ -29,21 +29,6 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
-    "createTrainingJob": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "checkTrainingJobStatus": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "triggerCodeBuild": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
     "listModel": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -55,11 +40,6 @@
       "service": "Lambda"
     },
     "deploymentLambda": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda"
-    },
-    "uploadMetricsToS3": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
@@ -192,10 +172,6 @@
       "providerPlugin": "awscloudformation"
     },
     "Device": {
-      "service": "DynamoDB",
-      "providerPlugin": "awscloudformation"
-    },
-    "ppaModel": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
     },

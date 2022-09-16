@@ -106,10 +106,14 @@ const TrainTable_v2 = ({ t }) => {
                         var _tmp = {}
                         _tmp['status'] = item['trainingJobStatus']
                         _tmp['model_data_url'] = item['trainingJobModelDataUrl']
-                        _tmp['creation_time'] = item['trainingJobStartTime']
+                        if('trainingJobStartTime' in item){
+                            _tmp['creation_time'] = new Date(item['trainingJobStartTime']).toLocaleString() 
+                        }else{
+                            _tmp['creation_time'] = ""
+                        }
                         _tmp['stage'] = item['stage']
                         _tmp['model_name'] = item['model_name']
-                        _tmp['model_creation_time'] = item['model.creation_time']
+                        _tmp['model_creation_time'] = new Date(item['model.creation_time']).toLocaleString()
                         // _tmp['cost'] = Math.floor(Math.random() * 10000)
                         // _tmp['size'] = Math.floor(Math.random() * 10).toString() + 'GB'
                         _tmp_data.push(_tmp)
