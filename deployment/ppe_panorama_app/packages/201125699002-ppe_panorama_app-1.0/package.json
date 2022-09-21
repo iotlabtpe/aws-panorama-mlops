@@ -38,22 +38,6 @@
                     {
                         "name": "video_in",
                         "type": "media"
-                    },
-                    {
-                        "name": "env",
-                        "type": "string"
-                    },
-                    {
-                        "name": "region",
-                        "type": "string"
-                    },
-                    {
-                        "name": "deviceId",
-                        "type": "string"
-                    },
-                    {
-                        "name": "cameraId",
-                        "type": "string"
                     }
                 ],
                 "outputs": [
