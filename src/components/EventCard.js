@@ -190,7 +190,7 @@ init(){
                         _tmp['location'] = item['location']
                         _tmp['name'] = item['name'] 
                         _tmp['time'] = item['time']
-                        _tmp['type'] = item['type']
+                        _tmp['type'] = item['type'] 
                         _tmp['picture'] = item['picture']
                         _tmp['label'] = item['label']
                         _tmp['video'] = item['video']
@@ -212,12 +212,13 @@ init(){
                             })
                         })
 
-                        // console.log(item)                        
                         if(item['type']==='mask' && item.ack_bbox_mask){
                             _tmp['output'] = item.ack_bbox_mask
                         } else if(item['type']==='helmet' && item.ack_bbox_helmet){
                             _tmp['output'] = item.ack_bbox_helmet
                         } else if(item['type']==='person' && item.ack_bbox_person){
+                            console.log("person")
+                            
                             _tmp['output'] = item.ack_bbox_person
                         } else if(item.label_string){
                             _tmp['output'] = []

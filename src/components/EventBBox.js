@@ -226,7 +226,7 @@ class EventBBox extends React.Component {
     query_init_bbox(item){
       // console.log()
       const { tag } = this.state;
-      var k = 'ack_bbox_mask' 
+      var k = 'ack_bbox_person' 
       console.log(k)
       var result = []
       // find out what output is in out

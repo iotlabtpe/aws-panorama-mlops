@@ -130,7 +130,7 @@ class YoLov5TRT(object):
         # Do postprocess
         
         prediction = self.post_process_batch(
-            output_batch, input_image_batch[0], image_raw_list[0]
+            output_batch, input_image_batch[0], image_raw_list[0], self.filtered_classes
         )
         # print(prediction, flush=True)
         t6 = time.time()

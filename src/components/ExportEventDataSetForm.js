@@ -40,7 +40,9 @@ class  ExportEventDataSetForm extends React.Component {
 
       tagOptions:[
         {value:'1',label:'口罩'},
-        {value:'2',label:'安全帽'}
+        {value:'2',label:'安全帽'},
+        {value:'3',label:'人'}
+
       ],
       tagSelectedOption:{name:'口罩',value:'1'},
       // curr_type:"true"
@@ -115,6 +117,9 @@ class  ExportEventDataSetForm extends React.Component {
       _type='mask'
     }else if (this.state.tagSelectedOption.value === '2'){
       _type='helmat'
+    }
+    else if(this.state.tagSelectedOption.value === '3'){
+      _type='person'
     }
     const apiUrl = '/save_event_result?type='+_type+'&&s3uri='+this.state.S3IN;
     // const apiUrl = '/export?type='+_type+'&&s3uri='+this.state.S3IN+'&&images_prefix='+this.state.IMGPREFIX+'&&labels_prefix='+this.state.LABELPREFIX;

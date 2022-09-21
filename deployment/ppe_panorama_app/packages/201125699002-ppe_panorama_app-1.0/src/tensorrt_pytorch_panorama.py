@@ -153,13 +153,15 @@ class ObjectDetectionApp(p.node):
                                 ],
                                 event_no,
                             ]
-                            # 1 > 0
+                            # 1 > 0｀
                             # cp = 1 
                             # rb = 0 cp = 0
                             # rb = 1 pub cp =1 
                             if len(result_boxes) > self.current_people:
                                 self.publish(socket, send_args)
                             self.current_people = len(result_boxes)
+                            log.info(f"Result Boxes: {len(result_boxes)}")
+                            log.info(f"Current People: {self.current_people}")
                             event_no += 1
                             if event_no >= self.maxn_event_no:
                                 event_no = 0

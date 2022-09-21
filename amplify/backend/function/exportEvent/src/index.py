@@ -48,11 +48,11 @@ def handler(event, context):
 def post_process_hit(payload, type, s3uri, images_prefix, labels_prefix):
     try:
         print("post_processing")
-        if type == "mask":
+        if type == "person":
             # print(payload['ack_mask'])
-            if "ack_bbox_mask" in payload:
-                print(payload["ack_bbox_mask"])
-                ack_bbox = payload["ack_bbox_mask"]
+            if "ack_bbox_person" in payload:
+                print(payload["ack_bbox_person"])
+                ack_bbox = payload["ack_bbox_person"]
             else:
                 return []
         else:

@@ -47,6 +47,14 @@ def processData(item):
         good["acknowledged"] = item["payload"]["acknowledged"]
     if "manual_modified" in item["payload"]:
         good["manual_modified"] = item["payload"]["manual_modified"]
+    if "ack_bbox_person" in item["payload"]:
+        box_group = []
+        for box in item["payload"]["ack_bbox_person"]:
+            new_box = []
+            for line in box:
+                new_box.append(str(line))
+            box_group.append(new_box)
+        good["ack_bbox_person"] = box_group
     if "ack_bbox_mask" in item["payload"]:
         box_group = []
         for box in item["payload"]["ack_bbox_mask"]:
