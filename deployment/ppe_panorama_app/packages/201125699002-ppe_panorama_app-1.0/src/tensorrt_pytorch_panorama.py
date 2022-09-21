@@ -54,16 +54,22 @@ class ObjectDetectionApp(p.node):
 
         # For PPE portal, IoT event report and camera monitoring. Hard code for demonstration.
 
-        self.env = self.inputs.env.get()
-        self.region = self.inputs.region.get()
-        self.deviceId = self.inputs.deviceId.get()
-        self.cameraId = self.inputs.cameraId.get()
+        # self.env = self.inputs.env.get()
+        # self.region = self.inputs.region.get()
+        # self.deviceId = self.inputs.deviceId.get()
+        # self.cameraId = self.inputs.cameraId.get()
+
+        self.env = "seven"
+        self.region = "ap-southeast-1"
+        self.deviceId = "device-zlawpfywl4qxcqsh5ahbjrubre"
+        self.cameraId = "ppe"
         self.ppe_iot_handler = PpeIot(
             self.env, self.region, self.deviceId, self.cameraId 
         )
 
         self.cordon_area = [(0.1, 0.2, 0.3, 0.7), (0.3, 0.2, 0.5, 0.7)]
         self.maxn_event_no = 1000000000
+        self.current_people = 0
 
     def listener(self):
         context = zmq.Context()
@@ -147,7 +153,13 @@ class ObjectDetectionApp(p.node):
                                 ],
                                 event_no,
                             ]
-                            self.publish(socket, send_args)
+                            # 1 > 0
+                            # cp = 1 
+                            # rb = 0 cp = 0
+                            # rb = 1 pub cp =1 
+                            if len(result_boxes) > self.current_people:
+                                self.publish(socket, send_args)
+                            self.current_people = len(result_boxes)
                             event_no += 1
                             if event_no >= self.maxn_event_no:
                                 event_no = 0
