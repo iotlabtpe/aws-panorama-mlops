@@ -34,7 +34,7 @@ def post(event, account_id):
         override_camera_template["nodeGraphOverrides"]["packages"].append(
             {
                 "name": "{acc_id}::{name}".format(acc_id=account_id, name=camera),
-                "version": "0.1",
+                "version": "1.0",
             }
         )
         override_camera_template["nodeGraphOverrides"]["nodes"].append(
