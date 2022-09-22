@@ -10,7 +10,7 @@ log = logging.getLogger('my_logger')
 # random_p = boto3.client('ssm',region_name='ap-southeast-1').get_parameter(Name='/ppe/random')
 target_s3_folder = "src"
 # target_s3_bucket = "panorama-app-" + random_p['Parameter']['Value']
-target_s3_bucket = "test-panorama-app"
+target_s3_bucket = "test-panorama-app-2"
 
 log.info(target_s3_bucket)
 log.info(target_s3_folder)
