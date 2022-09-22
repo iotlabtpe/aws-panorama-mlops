@@ -42,7 +42,7 @@ class NewStoredApplicationConfig extends React.Component {
 
   render(){
     const c = (<NewStoredApplicationForm history={this.props.history} />)
-    return  <FrameLayout breadcrumb="StoredApplicationConfig" component={c} />
+    return  <FrameLayout breadcrumb="NewStoredApplicationConfig" component={c} />
   }
 
 }

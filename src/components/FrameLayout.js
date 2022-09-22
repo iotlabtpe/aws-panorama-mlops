@@ -298,8 +298,8 @@ class FrameLayout extends React.Component {
                     href: "/",
                 },
                 {
-                    text: t("Model Training"),
-                    href: '/NewTrainingTask',
+                    text: t("Packaged Application"),
+                    href: '/TrainingList',
                 },
                 {
                     text: t("New Training"),
@@ -387,6 +387,21 @@ class FrameLayout extends React.Component {
                     href: "#",
                 },
                 ];
+            case "NewStoredApplicationConfig":
+                return [
+                    {
+                        text: t("Home"),
+                        href: "/",
+                    },
+                    {
+                        text: t("Stored Application"),
+                        href: "/StoredApplicationConfig",
+                    },
+                    {
+                        text: t("New Stored Application"),
+                        href: "#",
+                    },
+                ];
             case "DeploymentCfgList":
                 return [{
                     text: t("Home"),
@@ -407,11 +422,11 @@ class FrameLayout extends React.Component {
                     href: "/",
                 },
                 {
-                    text: t("Config"),
-                    href: "/NewDeployConfig",
+                    text: t("Deployed Application"),
+                    href: "/DeployConfig",
                 },
                 {
-                    text: t("New Deployment Config"),
+                    text: t("New Deployment"),
                     href: "#",
                 },
                 ];
@@ -582,8 +597,8 @@ class FrameLayout extends React.Component {
                         href: '/',
                     },
                     {
-                        text: t("Config"),
-                        href: '/NewCameraConfig',
+                        text: t("Camera Config"),
+                        href: '/CameraConfig',
                     },
                     {
                         text: t('New Camera Config'),
@@ -661,7 +676,7 @@ class FrameLayout extends React.Component {
         ]
 
         const _header = <Header
-            title={t("Out of Box AI Demo")}
+            title={t("Panorama MLOPS Demo")}
             rightContent={
 
                 <Box alignItems="center" display="flex" >
@@ -672,7 +687,7 @@ class FrameLayout extends React.Component {
         />
         const _header_side = {
             href: "/",
-            text: 'PPE Detector Demo'
+            text: 'Menu'
         }
 
 

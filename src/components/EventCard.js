@@ -14,6 +14,7 @@ import Button from 'aws-northstar/components/Button';
 import KeyValuePair from 'aws-northstar/components/KeyValuePair';
 import Badge from 'aws-northstar/components/Badge';
 import {withTranslation} from 'react-i18next'
+import Alert from 'aws-northstar/components/Alert';
 
 // import { Trans ,Translation } from 'react-i18next';
 // const hashHistory = createHashHistory();
@@ -377,6 +378,13 @@ btn_next(){
       return items
   }
 
+  renderNone(){
+    return (
+        <Alert type="warning" header="Warning header">
+            You didn't have any alert message right now 
+         </Alert>
+    )
+  }
   render(){
     const {
         state: { statusOptions,statusSelectedOption,tagSelectedOption,
@@ -415,9 +423,10 @@ btn_next(){
                     <Badge content={total_pages} color="blue" />
                 </Inline>  
             </Grid> */}
+            
             <Grid item xs={12}>
                 <Inline>   
-                    {this.renderBBox()}
+                    {this.renderBBox().length === 0 ?  this.renderNone() : this.renderBBox()}
                 </Inline>
             </Grid>
         </Grid>
