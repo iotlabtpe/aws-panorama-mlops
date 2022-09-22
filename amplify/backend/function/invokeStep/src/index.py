@@ -21,6 +21,10 @@ def handler(event, context):
 
         # *S3 Related Get 
         pretrainBucket = 'pretraininput-' + random_p
+
+        trainingBucket = 'pretraininput-' + random_p
+        if body['inputS3BucketName'] != "":
+            trainingBucket = body['inputS3BucketName']
         retrainBucket = 'retrainoutput-' + random_p
         panoramaAppBucket = 'panorama-app-' + random_p
         appGraphBucket = 'app-graph-' + random_p
@@ -31,7 +35,7 @@ def handler(event, context):
         # *CodeBuild Project
         codeBuildProject = 'Build-Panorama-App-' + os.environ['ENV']
 
-        # *S3 Bucket Name ( Zip file ) of Panorma APP
+        # *S3 Bucket Name ( Zip file ) of Panorma APP 
         app_name_zip = body["storedApplication"]
         
         # Step functions input 
@@ -41,8 +45,8 @@ def handler(event, context):
         stepInput['TrainingImage'] = training_image
         stepInput['cfgS3Uri'] = f's3://{pretrainBucket}/cfg'
         stepInput['weightsS3Uri'] = f's3://{pretrainBucket}/weights'
-        stepInput['imagesS3Uri'] = f's3://{pretrainBucket}/images'
-        stepInput['labelsS3Uri'] = f's3://{pretrainBucket}/labels'
+        stepInput['imagesS3Uri'] = f's3://{trainingBucket}/images'
+        stepInput['labelsS3Uri'] = f's3://{trainingBucket}/labels'
         stepInput['output_s3uri'] = f's3://{retrainBucket}'
         stepInput['instance_type'] = instance_type
         stepInput['role_arn'] = role_arn

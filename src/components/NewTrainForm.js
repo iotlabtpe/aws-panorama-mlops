@@ -30,7 +30,7 @@ class NewTrainForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      S3IN: "s3://",
+      S3IN: "",
       S3OUT: "s3://",
       // S3IN:"s3://spot-bot-assets-ap-east-1/mtr/s3/data",
       // S3OUT:"s3://spot-bot-assets-ap-east-1/mtr/s3/data",
@@ -39,6 +39,7 @@ class NewTrainForm extends React.Component {
       StoredApplicationOption:[],
       StoredApplication: "",
       visible: false,
+      // errorS3Name: true,
       post_result: '',
     }
   }
@@ -73,7 +74,7 @@ class NewTrainForm extends React.Component {
   submit() {
     // console.log(e)
     const payload = {
-      "input_s3uri": this.state.S3IN,
+      "inputS3BucketName": this.state.S3IN,
       "images_prefix": this.state.IMGPREFIX,
       "labels_prefix": this.state.LABELPREFIX,
       "output_s3uri": this.state.S3OUT,
@@ -105,6 +106,12 @@ class NewTrainForm extends React.Component {
   }
 
   handelS3IN(e) {
+    // if(/\s/g.test(e) === true || e === ""){
+    //   this.setState({ errorS3Name : true})
+    // }
+    // else{
+    //   this.setState({ errorS3Name : false})
+    // }
     this.setState({ S3IN: e })
   }
 
@@ -131,24 +138,25 @@ class NewTrainForm extends React.Component {
         actions={
           <div>
             {/* <Button variant="link">Cancel</Button> */}
-            <Button variant="primary" onClick={() => this.submit()}  >Submit</Button>
+            <Button variant="primary" onClick={() => this.submit()} disabled={ this.state.StoredApplication === "" ? true : false }  >Submit</Button>
           </div>
         }
         onSubmit={console.log}
       >
         <FormSection header={t('Create new Training Job')} >
-          {/* <FormField label="Input S3 URI" hintText="e.g. [bucket name]/[prefix]" controlId="formFieldId1">
+          <FormField label="Input S3 Bucket Name" controlId="formFieldId1">
             <Input type="text" controlId="input_s3uri" value={this.state.S3IN} onChange={(e) => this.handelS3IN(e)} />
           </FormField>
-          <FormField label="Input images prefix" hintText="e.g. images" controlId="formFieldId2">
+          {/* <FormField label="Input images prefix" hintText="e.g. images" controlId="formFieldId2">
             <Input type="text" controlId="images_prefix" value={this.state.IMGPREFIX} onChange={(e) => this.handelIMAGEPREFIX(e)} />
           </FormField>
           <FormField label="Input labels prefix" hintText="e.g. labels" controlId="formFieldId3">
             <Input type="text" controlId="labels_prefix" value={this.state.LABELPREFIX} onChange={(e) => this.handelLABELPREFIX(e)} />
-          </FormField>
-          <FormField label="Output S3 URI" hintText="e.g. [bucket name]/[prefix]" controlId="formFieldId4">
+          </FormField> */}
+          {/* <FormField label="Output S3 URI" hintText="e.g. [bucket name]/[prefix]" controlId="formFieldId4">
             <Input type="text" controlId="output_s3uri" value={this.state.S3OUT} onChange={(e) => this.handelS3OUT(e)} />
           </FormField> */}
+
           <FormField label="Stored Application" controlId="formFieldId5">
             <Select 
               options={this.state.StoredApplicationOption}

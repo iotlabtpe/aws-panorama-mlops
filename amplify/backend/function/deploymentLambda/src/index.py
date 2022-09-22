@@ -48,18 +48,18 @@ def post(event, account_id):
         )
         override_camera_template["nodeGraphOverrides"]["nodeOverrides"][0]["with"].append({"name": "{}".format(camera)})
 
-    # Override env node into Panorama Application
-    override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_env", "interface": "string", "value": env_p})
-    override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "environment_variable", "with": [{"name": "my_env"}]})
+    # # Override env node into Panorama Application
+    # override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_env", "interface": "string", "value": env_p})
+    # override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "environment_variable", "with": [{"name": "my_env"}]})
 
-    override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_region", "interface": "string", "value": os.environ["REGION"]})
-    override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "region_variable", "with": [{"name": "my_region"}]})
+    # override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_region", "interface": "string", "value": os.environ["REGION"]})
+    # override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "region_variable", "with": [{"name": "my_region"}]})
 
-    override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_deviceId", "interface": "string", "value": body['deviceId']})
-    override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "deviceId_variable", "with": [{"name": "my_deviceId"}]})
+    # override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_deviceId", "interface": "string", "value": body['deviceId']})
+    # override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "deviceId_variable", "with": [{"name": "my_deviceId"}]})
 
-    override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_cameraId", "interface": "string", "value": cameras[0]})
-    override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "cameraId_variable", "with": [{"name": "my_cameraId"}]})
+    # override_camera_template["nodeGraphOverrides"]["nodes"].append({"name": "my_cameraId", "interface": "string", "value": cameras[0]})
+    # override_camera_template["nodeGraphOverrides"]["nodeOverrides"].append({"replace": "cameraId_variable", "with": [{"name": "my_cameraId"}]})
 
 
     # Use targerArn for S3 bucket to download graph.json
