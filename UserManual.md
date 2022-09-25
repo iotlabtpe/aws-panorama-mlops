@@ -8,13 +8,17 @@ Click on **Stored Application** on the left menu, the below table will have one 
 
 If you wish to upload other application, just click on **New Application**
 
-<img width="1782" alt="Screen Shot 2022-09-25 at 2 53 24 PM" src="https://user-images.githubusercontent.com/61721490/192132088-7b72e8be-ec3d-4c8a-aac5-e53b6e356afb.png">
+
+
+<img width="1788" alt="Screen Shot 2022-09-25 at 7 13 43 PM" src="https://user-images.githubusercontent.com/61721490/192140720-7e3cbf72-66ec-45e7-a367-4c1792bb5088.png">
+
 
 Choose **uri** and then put the **bucket uri** where you put your zip file of application at
 
 **Remember to zip the folder of application**
 
-<img width="1781" alt="Screen Shot 2022-09-25 at 2 55 07 PM" src="https://user-images.githubusercontent.com/61721490/192132080-ec17a125-c6e7-4126-8e04-a0ec97761786.png">
+<img width="1780" alt="Screen Shot 2022-09-25 at 7 13 33 PM" src="https://user-images.githubusercontent.com/61721490/192140709-caeb31d2-7e51-46fc-b76f-4cdb17e4d459.png">
+
 
 
 
