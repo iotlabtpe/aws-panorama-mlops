@@ -15,6 +15,7 @@ import KeyValuePair from 'aws-northstar/components/KeyValuePair';
 import Badge from 'aws-northstar/components/Badge';
 import {withTranslation} from 'react-i18next'
 import Alert from 'aws-northstar/components/Alert';
+import { LoadingIndicator } from 'aws-northstar';
 
 // import { Trans ,Translation } from 'react-i18next';
 // const hashHistory = createHashHistory();
@@ -378,11 +379,12 @@ btn_next(){
       return items
   }
 
-  renderNone(){
+  renderLoading(){
     return (
-        <Alert type="warning" header="Warning header">
-            You didn't have any alert message right now 
-         </Alert>
+        <LoadingIndicator/>
+        // <Alert type="warning" header="Warning header">
+        //     You didn't have any alert message right now 
+        //  </Alert>
     )
   }
   render(){
@@ -426,7 +428,7 @@ btn_next(){
             
             <Grid item xs={12}>
                 <Inline>   
-                    {this.renderBBox().length === 0 ?  this.renderNone() : this.renderBBox()}
+                    {this.renderBBox().length === 0 ?  this.renderLoading() : this.renderBBox()}
                 </Inline>
             </Grid>
         </Grid>

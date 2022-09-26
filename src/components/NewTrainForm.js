@@ -144,7 +144,7 @@ class NewTrainForm extends React.Component {
         onSubmit={console.log}
       >
         <FormSection header={t('Create new Training Job')} >
-          <FormField label="Input S3 Bucket Name" controlId="formFieldId1">
+          <FormField label="Input Training Data's S3 Bucket Name" controlId="formFieldId1">
             <Input type="text" controlId="input_s3uri" value={this.state.S3IN} onChange={(e) => this.handelS3IN(e)} />
           </FormField>
           {/* <FormField label="Input images prefix" hintText="e.g. images" controlId="formFieldId2">

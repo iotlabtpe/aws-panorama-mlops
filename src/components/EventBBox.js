@@ -635,6 +635,7 @@ class EventBBox extends React.Component {
         }
         // console.log(result)
     })
+    window.location.reload()
 
 
   }

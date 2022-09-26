@@ -33,7 +33,7 @@ def processData(item):
     good["name"] = item["payload"]["name"]
     good["type"] = item["payload"]["type"]
 
-    print(item["payload"]["time"])
+    # print(item["payload"]["time"])
     good["time"] = item["payload"]["time"]
     good["flag"] = item["payload"]["flag"]
     good["location"] = item["payload"]["location"]
@@ -70,42 +70,49 @@ def handler(event, context):
     # TODO implement
     try:
         if event["httpMethod"] == "GET":
+            # has queryParmeter 
+            # if event['']
             print(event)
+            # print(event['pathParameters']['pr'])
             results = []
             response = table.scan()
             datas = response['Items']
+            
             while 'LastEvaluatedKey' in response:
                 response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
                 datas.update(response['Items'])
             for data in datas:
                 good = processData(data)
                 results.append(good)
-            body = results
+            returnBody = results
 
         # The way to process data on every request 
         if event["httpMethod"] == "POST":
+            body = json.loads(event['body'])
             print(event)
-            body = {}
-            if 'LastEvaluatedKey' in event['body']:
+            returnBody = {}
+            if 'LastEvaluatedKey' in body:
                 print('page')
                 response = table.scan(
                     Limit=10,
-                    ExclusiveStartKey=event['body']['LastEvaluatedKey']
+                    ExclusiveStartKey=body['LastEvaluatedKey']
                 )
                 if 'LastEvaluatedKey' in response:
-                    body['LastEvaluatedKey'] = response['LastEvaluatedKey']
+                    response['LastEvaluatedKey']['TimeStamp'] = int(response['LastEvaluatedKey']['TimeStamp'])
+                    returnBody['LastEvaluatedKey'] = response['LastEvaluatedKey']
+                
             else:
                 print('first page')
                 response = table.scan(Limit=10)
                 if 'LastEvaluatedKey' in response:
                     response['LastEvaluatedKey']['TimeStamp'] = int(response['LastEvaluatedKey']['TimeStamp'])
-                    body['LastEvaluatedKey'] = response['LastEvaluatedKey']
+                    returnBody['LastEvaluatedKey'] = response['LastEvaluatedKey']
             results = []
             print(response)
             for item in response["Items"]:
                 good = processData(item)
                 results.append(good)
-            body['Items'] = results
+            returnBody['Items'] = results
         # elif event["httpMethod"] == "POST":
         #     print(event["body"])
         #     table.update_item(
@@ -117,7 +124,7 @@ def handler(event, context):
         #     body = json.dumps("Update Successful")
         return {
             "statusCode": 200,
-            "body": json.dumps(body),
+            "body": json.dumps(returnBody),
             "headers": {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
