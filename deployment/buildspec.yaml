@@ -21,7 +21,7 @@ phases:
       - tar zxvf model.tar.gz
       - panorama-cli import-application
       - ls -lh ./packages/$ACCOUNT_ID-ppe_panorama_app-1.0/src/yolov5s.onnx
-      - cp ./visualsearch/weights/best.onnx ./packages/$ACCOUNT_ID-ppe_panorama_app-1.0/src/yolov5s.onnx
+      # - cp ./visualsearch/weights/best.onnx ./packages/$ACCOUNT_ID-ppe_panorama_app-1.0/src/yolov5s.onnx
       - ls -lh ./packages/$ACCOUNT_ID-ppe_panorama_app-1.0/src/yolov5s.onnx
       # - aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 201125699002.dkr.ecr.ap-southeast-1.amazonaws.com
       - panorama-cli build  --container-asset-name ppe_panorama_app  --package-path packages/$ACCOUNT_ID-ppe_panorama_app-1.0/

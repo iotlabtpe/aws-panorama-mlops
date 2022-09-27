@@ -169,7 +169,7 @@ init(){
         // const url = '/list_event/'+'?from='+this.state.current_from+'&&size='+page_size+doc_status+type_status
         const url = `/list_event/?from=${this.state.current_from}&&size=${page_size}${doc_status}${type_status}`
         // console.log(this.state.statusSelectedOption.value)
-        API.get('backend','/event').then(res => {
+        API.get('backend','/listEvent').then(res => {
                 // console.log(res)
                 if (res){
                     console.log(res)

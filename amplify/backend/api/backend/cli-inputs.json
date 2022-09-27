@@ -1,27 +1,6 @@
 {
   "version": 1,
   "paths": {
-    "/device": {
-      "name": "/device",
-      "lambdaFunction": "deviceLambda",
-      "permissions": {
-        "setting": "open"
-      }
-    },
-    "/training": {
-      "name": "/training",
-      "lambdaFunction": "invokeStep",
-      "permissions": {
-        "setting": "open"
-      }
-    },
-    "/model": {
-      "name": "/model",
-      "lambdaFunction": "listModel",
-      "permissions": {
-        "setting": "open"
-      }
-    },
     "/exportEvent": {
       "name": "/exportEvent",
       "lambdaFunction": "exportEvent",
@@ -36,30 +15,93 @@
         "setting": "open"
       }
     },
-    "/deployment": {
-      "name": "/deployment",
+    "/postCamera": {
+      "name": "/postCamera",
+      "lambdaFunction": "cameraLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/deleteCamera": {
+      "name": "/deleteCamera",
+      "lambdaFunction": "cameraLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/createDeployment": {
+      "name": "/createDeployment",
       "lambdaFunction": "deploymentLambda",
       "permissions": {
         "setting": "open"
       }
     },
-    "/event": {
-      "name": "/event",
-      "lambdaFunction": "listEvent",
+    "/deleteDeployment": {
+      "name": "/deleteDeployment",
+      "lambdaFunction": "deploymentLambda",
       "permissions": {
         "setting": "open"
       }
     },
-    "/storedApplication": {
-      "name": "/storedApplication",
+    "/listStoredApplication": {
+      "name": "/listStoredApplication",
       "lambdaFunction": "storedApplicationLambda",
       "permissions": {
         "setting": "open"
       }
     },
-    "/camera": {
-      "name": "/camera",
+    "/deleteStoredApplication": {
+      "name": "/deleteStoredApplication",
+      "lambdaFunction": "storedApplicationLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/createStoredApplication": {
+      "name": "/createStoredApplication",
+      "lambdaFunction": "storedApplicationLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/listDeployment": {
+      "name": "/listDeployment",
+      "lambdaFunction": "deploymentLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/listDevice": {
+      "name": "/listDevice",
+      "lambdaFunction": "deviceLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/listCamera": {
+      "name": "/listCamera",
       "lambdaFunction": "cameraLambda",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/listModel": {
+      "name": "/listModel",
+      "lambdaFunction": "listModel",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/invokeStep": {
+      "name": "/invokeStep",
+      "lambdaFunction": "invokeStep",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/listEvent": {
+      "name": "/listEvent",
+      "lambdaFunction": "listEvent",
       "permissions": {
         "setting": "open"
       }

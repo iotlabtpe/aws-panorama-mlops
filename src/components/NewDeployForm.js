@@ -144,7 +144,7 @@ class NewDeployForm extends React.Component {
     let result = "";
 
     console.log(payload);
-    API.post('backend', '/deployment', { body: payload }).then(response => {
+    API.post('backend', '/createDeployment', { body: payload }).then(response => {
       console.log(response);
       if (response) { 
         this.setState({ post_result: response }, () => {

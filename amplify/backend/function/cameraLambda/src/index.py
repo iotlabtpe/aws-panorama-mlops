@@ -25,7 +25,7 @@ def post(event):
         pano_client.create_node_from_template_job(
             NodeName=CAMERA_NAME,
             OutputPackageName=CAMERA_NAME,
-            OutputPackageVersion="0.1",
+            OutputPackageVersion="1.0",
             TemplateParameters=CAMERA_CREDS,
             TemplateType="RTSP_CAMERA_STREAM",
         )

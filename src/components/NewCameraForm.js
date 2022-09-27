@@ -63,7 +63,7 @@ class  NewCameraForm extends React.Component {
     console.log(payload);
     var result = "";
 
-    API.post('backend','/camera',{ body: payload }).then(response => {
+    API.post('backend','/postCamera',{ body: payload }).then(response => {
         console.log(response);
         if (response) {
             result = "Post Component request successfully !"

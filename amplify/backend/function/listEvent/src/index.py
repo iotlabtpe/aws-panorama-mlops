@@ -75,7 +75,11 @@ def handler(event, context):
             print(event)
             # print(event['pathParameters']['pr'])
             results = []
-            response = table.scan()
+            response = table.query(
+                IndexName='tag-timestamp-index',
+                KeyConditionExpression=Key('tag').eq('beta'),
+                ScanIndexForward=False
+            )
             datas = response['Items']
             
             while 'LastEvaluatedKey' in response:

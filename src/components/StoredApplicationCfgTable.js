@@ -61,7 +61,7 @@ class StoredApplicationCfgTable extends React.Component {
     }
 
     async load_data() {
-        await API.get('backend', '/storedApplication').then(res => {
+        await API.get('backend', '/listStoredApplication').then(res => {
             console.log('return Data', res)
             if (res) {
                 console.log(res)

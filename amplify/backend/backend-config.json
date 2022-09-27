@@ -58,6 +58,11 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "sendEvent": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "auth": {
@@ -93,30 +98,6 @@
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "deviceLambda",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
-        {
-          "category": "function",
-          "resourceName": "invokeStep",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
-        {
-          "category": "function",
-          "resourceName": "listModel",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
-        {
-          "category": "function",
           "resourceName": "exportEvent",
           "attributes": [
             "Name",
@@ -133,7 +114,7 @@
         },
         {
           "category": "function",
-          "resourceName": "deploymentLambda",
+          "resourceName": "cameraLambda",
           "attributes": [
             "Name",
             "Arn"
@@ -141,7 +122,7 @@
         },
         {
           "category": "function",
-          "resourceName": "listEvent",
+          "resourceName": "deploymentLambda",
           "attributes": [
             "Name",
             "Arn"
@@ -157,7 +138,31 @@
         },
         {
           "category": "function",
-          "resourceName": "cameraLambda",
+          "resourceName": "deviceLambda",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "listModel",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "invokeStep",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "listEvent",
           "attributes": [
             "Name",
             "Arn"

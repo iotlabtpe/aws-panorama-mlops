@@ -97,7 +97,7 @@ const TrainTable_v2 = ({ t }) => {
     useEffect(() => {
         const load_data = async () => {
             setLoading(true);
-            await API.get('backend', '/model').then(res => {
+            await API.get('backend', '/listModel').then(res => {
                 console.log(res)
                 if (res.Items) {
                     // console.log(res.data)

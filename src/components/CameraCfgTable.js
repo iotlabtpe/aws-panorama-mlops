@@ -88,7 +88,7 @@ class CameraCfgTable extends React.Component {
     }
 
     async load_data() {
-        await API.get('backend', '/camera').then(res => {
+        await API.get('backend', '/listCamera').then(res => {
             console.log('return Data', res)
             if (res) {
                 console.log(res)
@@ -124,7 +124,7 @@ class CameraCfgTable extends React.Component {
             "PackageId": this.state.current[0]['PackageId']
         }
         console.log(payload)
-        const response = await API.del('backend', '/camera', { body: payload })
+        const response = await API.del('backend', '/deleteCamera', { body: payload })
 
         this.setState({ visible: true })
         this.setState({ responseMessage: response })

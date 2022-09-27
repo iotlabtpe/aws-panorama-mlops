@@ -61,13 +61,6 @@ const columnDefinitions = [
             return null;
         }
     },
-    // {
-    //     'id': 'Camera_ID',
-    //     width: 200,
-    //     Header: 'Camera ID',
-    //     accessor: 'Camera_ID'
-    // },
-    // {
     {
         'id': 'Status',
         width: 400,
@@ -124,24 +117,6 @@ const columnDefinitions = [
         Header: 'Created Time',
         accessor: 'CreatedTime'
     },
-    // {
-    //     'id': 'components',
-    //     width: 600,
-    //     Header: 'CFG-Components',
-    //     accessor: 'components'
-    // },
-    // {
-    //     'id': 'deploymentPolicies',
-    //     width: 600,
-    //     Header: 'CFG-Policy',
-    //     accessor: 'deploymentPolicies'
-    // },
-    // {
-    //     'id': 'iotJobConfigurations',
-    //     width: 600,
-    //     Header: 'CFG-IoTJob',
-    //     accessor: 'iotJobConfigurations'
-    // },
 ]
 
 
@@ -156,7 +131,7 @@ const DeploymentCfgTable = ({ t, changeLang }) => {
     // console.log(current);
     useEffect(() => {
         const load_data = async () => {
-            await API.get('backend', '/deployment').then(res => {
+            await API.get('backend', '/listDeployment').then(res => {
                 console.log(res)
                 if (res) {
                     console.log(res)
@@ -171,36 +146,12 @@ const DeploymentCfgTable = ({ t, changeLang }) => {
                         _tmp['Arn'] = item['Arn']
                         _tmp['targetArn'] = item['targetArn']
                         _tmp['CreatedTime'] = item['CreatedTime']
-
-                        _tmp_data.push(_tmp)
+                        
+                        if(_tmp['Status'] !== 'REMOVAL_SUCCEEDED'){
+                            _tmp_data.push(_tmp)
+                        }
                     });
 
-                    // const test_data =  {
-                    //     'Deployment_ID':'cb831c07-2556-4433-ad60-da0720d78113',
-                    //     'Device_ID':'123',
-                    //     'Camera_ID':'123',
-                    //     'Component_Version_ID':'123',
-                    //     'Model_Version_ID':'123',
-                    //     'targetArn':'123',
-                    //     'deploymentName':'123',
-                    //     'components':'123',
-                    //     'deploymentPolicies':'123',
-                    //     'iotJobConfigurations':'123',
-                    // }
-                    // const test_data_2 =  {
-                    //     'Deployment_ID':'cb831c07-2556-4433-ad60-da0720d7811311',
-                    //     'Device_ID':'123333',
-                    //     'Camera_ID':'123',
-                    //     'Component_Version_ID':'123',
-                    //     'Model_Version_ID':'123',
-                    //     'targetArn':'123',
-                    //     'deploymentName':'123',
-                    //     'components':'123',
-                    //     'deploymentPolicies':'123',
-                    //     'iotJobConfigurations':'123',
-                    // }
-                    // _tmp_data.push(test_data);
-                    // _tmp_data.push(test_data_2);
                     console.log(_tmp_data);
                     setJoblist(_tmp_data);
                     setLoading(false);
@@ -219,7 +170,7 @@ const DeploymentCfgTable = ({ t, changeLang }) => {
         const payload = {
             "ApplicationInstanceId": current[0].ApplicationInstanceId
         }
-        const response = await API.del('backend', '/deployment', { body: payload })
+        const response = await API.del('backend', '/deleteDeployment', { body: payload })
 
         setVisible(true)
         setResponseMessage(response)

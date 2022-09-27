@@ -83,7 +83,7 @@ class NewTrainForm extends React.Component {
     // var result = "=> call"  + apiUrl + "\n";
     var result = "";
 
-    API.post('backend', '/training', { body: payload }).then(response => {
+    API.post('backend', '/invokeStep', { body: payload }).then(response => {
       console.log(response);
       if (response.status === 200) {
         result = "Create training job successfully !"

@@ -768,6 +768,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - dynamodb:*
+                  - lambda:*
                 Resource: '*'
   IotTopic:
     Type: AWS::IoT::TopicRule
@@ -795,6 +796,10 @@ Resources:
                   - '-'
                   - - Event
                     - Ref: env
+          - Lambda:
+              FunctionArn: !Sub
+                - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:sendEvent-${Env}'
+                - Env: !Ref env 
         Description: >-
           Publish IOT topic for Panorama Devices to send alert message to
           Database

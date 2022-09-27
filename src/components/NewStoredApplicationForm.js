@@ -55,7 +55,7 @@ class  NewStoredApplicationForm extends React.Component {
     };
     console.log(payload);
 
-    API.post('backend','/storedApplication',{ body: payload }).then(response => {
+    API.post('backend','/createStoredApplication',{ body: payload }).then(response => {
         console.log(response);
         if(response){
             this.setState({post_result: response},()=>{

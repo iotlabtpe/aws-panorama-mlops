@@ -116,7 +116,7 @@ class  EventTable extends React.Component {
   async load_data(){
     const payload = {}
     const HEADERS = {'Content-Type': 'application/json'};
-    await API.get('backend','/event').then(res => {
+    await API.get('backend','/listEvent').then(res => {
         console.log(res)
         if (res){
             console.log(res)

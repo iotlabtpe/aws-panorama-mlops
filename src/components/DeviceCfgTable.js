@@ -95,7 +95,7 @@ class DeviceCfgTable extends React.Component {
 
 
   async load_data() {
-    await API.get('backend', '/device').then(res => {
+    await API.get('backend', '/listDevice').then(res => {
       console.log('data', res)
       if (res) {
         console.log(res.data)
@@ -145,19 +145,19 @@ class DeviceCfgTable extends React.Component {
       props: { t }
     } = this;
 
-    const tableActions = (
-      <Inline>
-        <Button onClick={() => this.delete_camera()} disabled={this.state.current.length === 0 ? true : false}>
-          {t('Delete Device')}
-        </Button>
-      </Inline>
-    );
+    // const tableActions = (
+    //   <Inline>
+    //     <Button onClick={() => this.delete_camera()} disabled={this.state.current.length === 0 ? true : false}>
+    //       {t('Delete Device')}
+    //     </Button>
+    //   </Inline>
+    // );
 
     return (
       <>
         <Table
           id="DeviceCfgTable"
-          actionGroup={tableActions}
+          // actionGroup={tableActions}
           tableTitle={t('Device Config')}
           multiSelect={false}
           columnDefinitions={columnDefinitions}

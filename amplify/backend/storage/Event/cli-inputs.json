@@ -9,6 +9,18 @@
     "fieldName": "TimeStamp",
     "fieldType": "number"
   },
-  "gsi": [],
+  "gsi": [
+    {
+      "name": "tag-timestamp-index",
+      "partitionKey": {
+        "fieldName": "tag",
+        "fieldType": "string"
+      },
+      "sortKey": {
+        "fieldName": "TimeStamp",
+        "fieldType": "number"
+      }
+    }
+  ],
   "triggerFunctions": []
 }

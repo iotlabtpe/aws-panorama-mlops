@@ -88,7 +88,9 @@ def handler(event, context):
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Headers": "*",
                 },
-            }             
+            }
+    elif event['httpMethod'] == 'DELETE':
+        pass     
 
 def upload_file(file, s3bucket, s3key):
     print("Uploading...")

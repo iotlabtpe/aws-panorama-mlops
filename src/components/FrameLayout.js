@@ -60,13 +60,13 @@ class FrameLayout extends React.Component {
                 },
                 {
                     "type": SideNavigationItemType.LINK,
-                    "text": t("Deployed Application"),
-                    "href": "/DeployConfig"
+                    "text": t("Packaged Application"),
+                    "href": "/TrainingList"
                 },
                 {
                     "type": SideNavigationItemType.LINK,
-                    "text": t("Packaged Application"),
-                    "href": "/TrainingList"
+                    "text": t("Deployed Application"),
+                    "href": "/DeployConfig"
                 },
             ]
         },
