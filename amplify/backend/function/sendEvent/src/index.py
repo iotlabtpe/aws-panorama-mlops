@@ -1,6 +1,7 @@
 import json
 import boto3
 import os
+from decimal import Decimal
 def handler(event, context):
   print('received event:')
   print(event)
@@ -9,12 +10,18 @@ def handler(event, context):
   tableName = 'Event-' + os.environ["ENV"] 
   dynamodb = boto3.resource('dynamodb')
   table = dynamodb.Table(tableName)
+  
+  body = event
+  body['TimeStamp'] = int(body['TimeStamp'])
 
-#   table.put_item(
-#     Item={
-#         {'cameraId': '34','TimeStamp':  'microsoft', 'tag': 'beta'}
-#     }
-#   )
+  table.put_item(
+    Item={
+        'cameraId': body['CameraID'],
+        'TimeStamp': body['TimeStamp'],
+        'payload':  json.dumps(body),
+        'tag': 'beta'
+    }
+  )
   
   return {
       'statusCode': 200,

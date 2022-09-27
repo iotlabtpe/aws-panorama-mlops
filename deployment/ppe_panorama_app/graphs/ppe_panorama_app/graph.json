@@ -3,7 +3,7 @@
         "envelopeVersion": "2021-01-01",
         "packages": [
             {
-                "name": "201125699002::ppe_panorama_app",
+                "name": "201123456789::ppe_panorama_app",
                 "version": "1.0"
             },
             {
@@ -28,7 +28,7 @@
             },
             {
                 "name": "ppe_panorama_app_node",
-                "interface": "201125699002::ppe_panorama_app.ppe_panorama_app_interface",
+                "interface": "201123456789::ppe_panorama_app.ppe_panorama_app_interface",
                 "overridable": false,
                 "launch": "onAppStart"
             },

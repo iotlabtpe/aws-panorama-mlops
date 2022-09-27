@@ -780,22 +780,22 @@ Resources:
             - Ref: env
       TopicRulePayload:
         Actions:
-          - DynamoDB:
-              HashKeyField: CameraID
-              HashKeyType: STRING
-              HashKeyValue: ${CameraID}
-              RangeKeyField: TimeStamp
-              RangeKeyType: NUMBER
-              RangeKeyValue: ${TimeStamp()}
-              RoleArn:
-                Fn::GetAtt:
-                  - IotRule
-                  - Arn
-              TableName:
-                Fn::Join:
-                  - '-'
-                  - - Event
-                    - Ref: env
+          # - DynamoDB:
+          #     HashKeyField: CameraID
+          #     HashKeyType: STRING
+          #     HashKeyValue: ${CameraID}
+          #     RangeKeyField: TimeStamp
+          #     RangeKeyType: NUMBER
+          #     RangeKeyValue: ${TimeStamp()}
+          #     RoleArn:
+          #       Fn::GetAtt:
+          #         - IotRule
+          #         - Arn
+          #     TableName:
+          #       Fn::Join:
+          #         - '-'
+          #         - - Event
+          #           - Ref: env
           - Lambda:
               FunctionArn: !Sub
                 - 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:sendEvent-${Env}'
@@ -809,6 +809,16 @@ Resources:
             - - SELECT * FROM 'ppe/event/
               - Ref: env
               - ''''
+  PermissionForIotInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: 
+        Fn::Join:
+            - '-'
+            - - sendEvent
+              - Ref: env
+      Action: lambda:*
+      Principal: 'iot.amazonaws.com'
   InvokePreinstalled:
     Type: AWS::CloudFormation::CustomResource
     Version: '1.0'
