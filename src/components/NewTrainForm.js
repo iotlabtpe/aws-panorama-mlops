@@ -53,7 +53,7 @@ class NewTrainForm extends React.Component {
 
   }
   async load_data(){
-    await API.get('backend', '/storedApplication').then(res => {
+    await API.get('backend', '/listStoredApplication').then(res => {
       console.log(res)
       if (res) {
         let option_data = []

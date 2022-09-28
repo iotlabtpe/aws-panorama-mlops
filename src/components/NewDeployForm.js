@@ -64,7 +64,7 @@ class NewDeployForm extends React.Component {
   }
 
   async load_data() {
-    await API.get('backend', '/camera').then(res => {
+    await API.get('backend', '/listCamera').then(res => {
       console.log(res)
       if (res) {
         console.log(res)
@@ -94,7 +94,7 @@ class NewDeployForm extends React.Component {
       // console.log(this.state.model_list)
       return res
     })
-    await API.get('backend', '/device').then(res => {
+    await API.get('backend', '/listDevice').then(res => {
       // await axios.get('/test_cors', {dataType: 'json'}).then(res => {
       console.log(res)
       if (res) {

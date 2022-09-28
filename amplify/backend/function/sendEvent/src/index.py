@@ -1,7 +1,6 @@
 import json
 import boto3
 import os
-from decimal import Decimal
 def handler(event, context):
   print('received event:')
   print(event)
@@ -16,10 +15,10 @@ def handler(event, context):
 
   table.put_item(
     Item={
-        'cameraId': body['CameraID'],
-        'TimeStamp': body['TimeStamp'],
-        'payload':  json.dumps(body),
-        'tag': 'beta'
+      'CameraID': body['CameraID'],
+      'TimeStamp': body['TimeStamp'],
+      'payload':  body,
+      'tag': 'beta'
     }
   )
   
