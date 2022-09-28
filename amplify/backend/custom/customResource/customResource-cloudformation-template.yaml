@@ -772,7 +772,6 @@ Resources:
                 Resource: '*'
   IotTopic:
     Type: AWS::IoT::TopicRule
-    DependsOn: PermissionForIotInvoke
     Properties:
       RuleName:
         Fn::Join:
@@ -816,6 +815,7 @@ Resources:
       FunctionName: !Ref SendEventLambda
       Action: lambda:invokeFunction
       Principal: 'iot.amazonaws.com'
+      SourceArn: !GetAtt IotTopic.Arn 
   SendEventLambda:
     Type: AWS::Lambda::Function
     Properties:
