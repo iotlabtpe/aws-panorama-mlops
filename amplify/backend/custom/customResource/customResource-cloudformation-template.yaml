@@ -809,16 +809,16 @@ Resources:
             - - SELECT * FROM 'ppe/event/
               - Ref: env
               - ''''
-  PermissionForIotInvoke:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: 
-        Fn::Join:
-            - '-'
-            - - sendEvent
-              - Ref: env
-      Action: lambda:*
-      Principal: 'iot.amazonaws.com'
+  # PermissionForIotInvoke:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     FunctionName: 
+  #       Fn::Join:
+  #           - '-'
+  #           - - sendEvent
+  #             - Ref: env
+  #     Action: lambda:*
+  #     Principal: 'iot.amazonaws.com'
   InvokePreinstalled:
     Type: AWS::CloudFormation::CustomResource
     Version: '1.0'
