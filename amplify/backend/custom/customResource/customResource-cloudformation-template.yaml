@@ -772,6 +772,7 @@ Resources:
                 Resource: '*'
   IotTopic:
     Type: AWS::IoT::TopicRule
+    DependsOn: PermissionForIotInvoke
     Properties:
       RuleName:
         Fn::Join:
@@ -809,16 +810,68 @@ Resources:
             - - SELECT * FROM 'ppe/event/
               - Ref: env
               - ''''
-  # PermissionForIotInvoke:
-  #   Type: AWS::Lambda::Permission
-  #   Properties:
-  #     FunctionName: 
-  #       Fn::Join:
-  #           - '-'
-  #           - - sendEvent
-  #             - Ref: env
-  #     Action: lambda:*
-  #     Principal: 'iot.amazonaws.com'
+  PermissionForIotInvoke:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SendEventLambda
+      Action: lambda:invokeFunction
+      Principal: 'iot.amazonaws.com'
+  SendEventLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.9
+      Handler: index.handler
+      FunctionName:
+        Fn::Join:
+          - '-'
+          - - sendEvent
+            - Ref: env
+      Environment:
+        Variables:
+          ENV:
+            Ref: env
+          REGION:
+            Ref: AWS::Region
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+          def handler(event, context):
+            print('received event:')
+            print(event)
+            
+
+            tableName = 'Event-' + os.environ["ENV"] 
+            dynamodb = boto3.resource('dynamodb')
+            table = dynamodb.Table(tableName)
+            
+            body = event
+            body['TimeStamp'] = int(body['TimeStamp'])
+
+            table.put_item(
+              Item={
+                'CameraID': body['CameraID'],
+                'TimeStamp': body['TimeStamp'],
+                'payload':  body,
+                'tag': 'beta'
+              }
+            )
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Access-Control-Allow-Headers': '*',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                },
+                'body': json.dumps('Hello from your new Amplify Python lambda!')
+            }
+      Role:
+        Fn::GetAtt:
+          - LambdaRole
+          - Arn
+      Timeout: 300
   InvokePreinstalled:
     Type: AWS::CloudFormation::CustomResource
     Version: '1.0'
