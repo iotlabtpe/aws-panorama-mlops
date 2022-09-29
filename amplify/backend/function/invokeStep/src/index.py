@@ -37,11 +37,17 @@ def handler(event, context):
 
         # *S3 Bucket Name ( Zip file ) of Panorma APP 
         app_name_zip = body["storedApplication"]
+
+        # *Skip Training 
+        skip_train = False 
+        if body['inputS3BucketName'] == "":
+            skip_train = True 
         
         # Step functions input 
         instance_type = 'ml.c5.18xlarge'
 
         stepInput = {}
+        stepInput['skipTrain'] = skip_train
         stepInput['TrainingImage'] = training_image
         stepInput['cfgS3Uri'] = f's3://{pretrainBucket}/cfg'
         stepInput['weightsS3Uri'] = f's3://{pretrainBucket}/weights'

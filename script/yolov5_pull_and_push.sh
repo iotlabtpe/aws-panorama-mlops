@@ -38,7 +38,11 @@ fullname_dst="${dst_id}.dkr.ecr.${dst_region}.${aws_endpoint}/${image}:latest"
 if ! aws ecr describe-repositories --repository-names "${image}" --region ${dst_region};
 then
     aws ecr create-repository --repository-name "${image}" --region ${dst_region}
+
+    echo 'Create successfully'
     aws ecr get-login-password --region ${dst_region} | sudo docker login --username AWS --password-stdin ${dst_id}.dkr.ecr.${dst_region}.${aws_endpoint}
+
+    echo 'Login successfully'
     # aws ecr get-login-password --region ${src_region} | sudo docker login --username AWS --password-stdin ${src_id}.dkr.ecr.${src_region}.${aws_endpoint}
 
 
