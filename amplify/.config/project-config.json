@@ -2,7 +2,7 @@
   "providers": [
     "awscloudformation"
   ],
-  "projectName": "AmplifyPPETest1",
+  "projectName": "PanoramaMLOps",
   "version": "3.1",
   "frontend": "javascript",
   "javascript": {
