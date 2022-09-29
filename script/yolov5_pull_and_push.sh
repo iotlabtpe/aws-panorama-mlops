@@ -30,6 +30,8 @@ dst_region=$1
 #     aws_endpoint="amazonaws.com"
 # fi
 
+aws_endpoint="amazonaws.com"
+
 # fullname_src="${src_id}.dkr.ecr.${src_region}.${aws_endpoint}/${image}:latest"
 fullname_dst="${dst_id}.dkr.ecr.${dst_region}.${aws_endpoint}/${image}:latest"
 
