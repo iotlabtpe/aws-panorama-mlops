@@ -52,16 +52,13 @@ then
     base_img='pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime'
     echo 'base_img:'$base_img
 
-    img_name='yolov5_train'
-    echo 'img_name:'$img_name
-
     cd container 
 
     echo $PWD 
 
-    sudo docker build --no-cache -t ${img_name} -f Dockerfile --build-arg BASE_IMG=$base_img .
+    sudo docker build --no-cache -t ${image} -f Dockerfile --build-arg BASE_IMG=$base_img .
     # sudo docker pull ${fullname_src}
-    sudo docker tag ${img_name} ${fullname_dst}
+    sudo docker tag ${image} ${fullname_dst}
     sudo docker push ${fullname_dst}
 fi
 
