@@ -1,0 +1,36 @@
+#! /bin/bash
+FP_PARA=/opt/ml/input/data/cfg/train-args.json
+data=$(cat $FP_PARA | jq -r '.FP_DATA')
+yolo=$(cat $FP_PARA | jq -r '.FP_YOLO')
+weight=$(cat $FP_PARA | jq -r '.FP_WEIGHT')
+hyp=$(cat $FP_PARA | jq -r '.FP_HYP')
+img=$(cat $FP_PARA | jq -r '.IMG_SIZE')
+batch=$(cat $FP_PARA | jq -r '.BATCH')
+epochs=$(cat $FP_PARA | jq -r '.EPOCHS')
+name=$(cat $FP_PARA | jq -r '.NAME')
+echo $data
+echo $yolo
+echo $weight
+# split dataset to train and valid
+python /opt/code/train_valid_split.py --data_yaml $data
+# train
+python /opt/yolov5/train.py --img $img --batch $batch --hyp $hyp --epochs $epochs --data $data \
+--cfg $yolo --weights $weight --name $name
+#python /opt/yolov5/export.py --weights /opt/yolov5/runs/train/$name/weights/best.pt --include  onnx
+python /opt/yolov5/export_trt7_onnx.py --weights /opt/yolov5/runs/train/$name/weights/best.pt --include  onnx
+
+pwd
+ls /opt
+echo "@@@@@@@"
+ls /opt/yolov5
+echo "######"
+find /opt/yolov5 -name best* 
+echo "+++++++"
+ls /opt/yolov5/runs/train/$name
+echo "%%%%%%%"
+find /opt/yolov5 -name *onnx
+echo "======="
+find /opt/yolov5
+echo "-------"
+cp -r /opt/yolov5/runs/train/$name /opt/ml/model/
+#cp -r /opt/code/runs/train/$name /opt/ml/model/
