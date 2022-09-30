@@ -17,16 +17,17 @@ phases:
       - echo $APP_S3_Uri          # Output the APP_S3_Uri
       - aws s3 cp $APP_S3_Uri ./  # pull the zip file to the local 
       - unzip $APP_Name          #unzip
-      - cd $APP_Name  
       - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
       - export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - |
         if [ -z "$MODEL_S3" ] ; then
+          cd $APP_Name  
           echo $PWD
           echo 'Not Using Model'
           panorama-cli import-application
           ls -lh ./packages/$ACCOUNT_ID-ppe_panorama_app-1.0/src/yolov5s.onnx
         else
+          cd $APP_Name  
           echo $PWD
           echo 'Model exists'
           aws s3 cp $MODEL_S3 ./
