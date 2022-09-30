@@ -37,36 +37,27 @@ const columnDefinitions = [
         }
     },
     {
-        'id': 'trainingjob.status',
+        'id': 'stage',
         width: 150,
-        Header: 'JobStatus',
-        accessor: 'JobStatus',
+        Header: 'Stage',
+        accessor: 'stage',
         Cell: ({ row }) => {
             if (row && row.original) {
                 // console.log(row.original)
-                const status = row.original.status;
+                const status = row.original.stage;
+                console.log(status)
                 switch (status) {
-                    case 'InProgress':
-                        return <StatusIndicator statusType="info">In Procress</StatusIndicator>;
+                    case 'Training':
+                        return <StatusIndicator statusType="info">Training</StatusIndicator>;
+                    case 'Packaging':
+                        return <StatusIndicator statusType="info">Packaing</StatusIndicator>;
+                    case 'Complete':
+                        return <StatusIndicator statusType="positive">Completed</StatusIndicator>;
                     case 'Error':
                         return <StatusIndicator statusType="negative">Error</StatusIndicator>;
-                    case 'Completed':
-                        if (row.original.model_name) {
-                            // const model_id = row.original.model_name;
-                            // const target = "/TrainingResult/"+model_id;
-                            return <div>
-                                <StatusIndicator statusType={"positive"} >{status}</StatusIndicator>
-                            </div>
-                        } else {
-                            return <div>
-                                <StatusIndicator statusType="positive" >{status}</StatusIndicator>
-                            </div>;
-                        }
                     default:
                         return (
-                            <div>
                                 <StatusIndicator statusType="info" >Training</StatusIndicator>
-                            </div>
                         );
                 }
             }

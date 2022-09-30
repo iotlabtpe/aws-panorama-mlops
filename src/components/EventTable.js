@@ -112,6 +112,16 @@ class  EventTable extends React.Component {
     })
   }
 
+  convertUTCDateToLocalDate(date) {
+    var newDate = new Date(date.getTime()+date.getTimezoneOffset()*60*1000);
+
+    var offset = date.getTimezoneOffset() / 60;
+    var hours = date.getHours();
+
+    newDate.setHours(hours - offset);
+
+    return newDate;   
+  }
 
   async load_data(){
     const payload = {}
@@ -133,7 +143,10 @@ class  EventTable extends React.Component {
                 _tmp['video_filename'] = item['video_filename']
                 _tmp['location'] = item['location']
                 _tmp['name'] = item['name']
-                _tmp['time'] = item['time']
+
+                const date = this.convertUTCDateToLocalDate(new Date(item['time']))
+
+                _tmp['time'] = date.toLocaleString()
                 _tmp['type'] = item['type']
                 _tmp['picture'] = item['picture']
                 _tmp['origin_picture'] = item['origin_picture']

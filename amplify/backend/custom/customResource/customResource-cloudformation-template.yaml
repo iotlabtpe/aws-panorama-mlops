@@ -520,8 +520,74 @@ Resources:
             - Ref: env
       DefinitionString: |-
             {
-              "StartAt": "SageMaker CreateTrainingJob",
+              "StartAt": "SkipTrain",
               "States": {
+                "SkipTrain": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.skipTrain",
+                      "BooleanEquals": true,
+                      "Next": "DynamoDB PutItem (1)"
+                    }
+                  ],
+                  "Default": "SageMaker CreateTrainingJob"
+                },
+                "DynamoDB PutItem (1)": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::dynamodb:putItem",
+                  "Parameters": {
+                    "TableName.$": "$.table_name",
+                    "Item": {
+                      "model_name": {
+                        "S.$": "$.model_name"
+                      },
+                      "stage": {
+                        "S": "Packaging"
+                      },
+                      "trainingJobStartTime": {
+                        "S.$": "$$.Execution.StartTime"
+                      }
+                    }
+                  },
+                  "Next": "CodeBuild StartBuild (1)",
+                  "ResultPath": null
+                },
+                "CodeBuild StartBuild (1)": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::codebuild:startBuild.sync",
+                  "Parameters": {
+                    "ProjectName.$": "$.project_name",
+                    "EnvironmentVariablesOverride": [
+                      {
+                        "Name": "MODEL_NAME",
+                        "Value.$": "$.model_name",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "DB_TABLE_NAME",
+                        "Value.$": "$.table_name",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "GRAPH_S3",
+                        "Value.$": "$.GRAPH_S3",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "APP_S3_Uri",
+                        "Value.$": "$.app_s3_uri",
+                        "Type": "PLAINTEXT"
+                      },
+                      {
+                        "Name": "APP_Name",
+                        "Value.$": "$.app_name",
+                        "Type": "PLAINTEXT"
+                      }
+                    ]
+                  },
+                  "End": true
+                },
                 "SageMaker CreateTrainingJob": {
                   "Type": "Task",
                   "Resource": "arn:aws:states:::sagemaker:createTrainingJob",
@@ -614,7 +680,7 @@ Resources:
                         "S.$": "$.model_name"
                       },
                       "stage": {
-                        "S": "training_job"
+                        "S": "training"
                       }
                     }
                   },
@@ -665,7 +731,7 @@ Resources:
                         "S.$": "$.model_name"
                       }
                     },
-                    "UpdateExpression": "SET trainingJobStatus = :val, trainingJobModelDataUrl = :val2, trainingJobStartTime = :val3, trainingJobEndTime = :val4",
+                    "UpdateExpression": "SET trainingJobStatus = :val, trainingJobModelDataUrl = :val2, trainingJobStartTime = :val3, trainingJobEndTime = :val4, stage= :val5",
                     "ExpressionAttributeValues": {
                       ":val": {
                         "S.$": "$.training.TrainingJobStatus"
@@ -678,6 +744,9 @@ Resources:
                       },
                       ":val4": {
                         "S.$": "$.training.TrainingEndTime"
+                      },
+                      ":val5": {
+                        "S": "Packaging"
                       }
                     },
                     "ReturnValues": "UPDATED_NEW"

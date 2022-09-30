@@ -38,9 +38,21 @@ class NewTrainForm extends React.Component {
       LABELPREFIX: "labels",
       StoredApplicationOption:[],
       StoredApplication: "",
+      bucketInputDisabled: true,
       visible: false,
       // errorS3Name: true,
       post_result: '',
+      methodOption: [
+        {
+          "label":"Packaging",
+          "value":"Packaging"
+        },
+        {
+          "label":"Training + Packaging",
+          "value":"Training + Packaging"
+        }
+      ],
+      method:""
     }
   }
 
@@ -115,16 +127,28 @@ class NewTrainForm extends React.Component {
     this.setState({ S3IN: e })
   }
 
-  handelS3OUT(e) {
-    this.setState({ S3OUT: e })
-  }
+  // handelS3OUT(e) {
+  //   this.setState({ S3OUT: e })
+  // }
 
-  handelIMAGEPREFIX(e) {
-    this.setState({ IMGPREFIX: e })
-  }
+  // handelIMAGEPREFIX(e) {
+  //   this.setState({ IMGPREFIX: e })
+  // }
 
-  handelLABELPREFIX(e) {
-    this.setState({ LABELPREFIX: e })
+  // handelLABELPREFIX(e) {
+  //   this.setState({ LABELPREFIX: e })
+  // }
+
+  handleMethodChange(e) {
+
+    // Training + Packaging 
+    if(e.target.value === 'Training + Packaging'){
+      this.setState({bucketInputDisabled:false})
+    }
+    else{
+      this.setState({bucketInputDisabled:true})
+    }
+    this.setState({method: this.state.methodOption.find(o => o.value === e.target.value)})
   }
 
 
@@ -138,14 +162,33 @@ class NewTrainForm extends React.Component {
         actions={
           <div>
             {/* <Button variant="link">Cancel</Button> */}
-            <Button variant="primary" onClick={() => this.submit()} disabled={ this.state.StoredApplication === "" ? true : false }  >Submit</Button>
+            <Button 
+              variant="primary" 
+              onClick={() => this.submit()} 
+              disabled={ this.state.StoredApplication === "" || this.state.method === "" ? true : false }  >
+                Submit
+            </Button>
           </div>
         }
         onSubmit={console.log}
       >
         <FormSection header={t('Create new Training Job')} >
+          <FormField label="Application Method" controlId="formFieldId1">
+            <Select 
+              options={this.state.methodOption}
+              onChange={(e) => this.handleMethodChange(e)}
+              // onChange={(e) => console.log(e.target.value)}
+              selectedOption={this.state.method}
+              
+            />
+          </FormField>
           <FormField label="Input Training Data's S3 Bucket Name" controlId="formFieldId1">
-            <Input type="text" controlId="input_s3uri" value={this.state.S3IN} onChange={(e) => this.handelS3IN(e)} />
+            <Input 
+              type="text" 
+              controlId="input_s3uri" 
+              value={this.state.S3IN} onChange={(e) => this.handelS3IN(e)}  
+              placeholder="Make sure you have enough data ( > 1000 pics ) to do the training"
+              disabled={ this.state.bucketInputDisabled === true ? true : false }/>
           </FormField>
           {/* <FormField label="Input images prefix" hintText="e.g. images" controlId="formFieldId2">
             <Input type="text" controlId="images_prefix" value={this.state.IMGPREFIX} onChange={(e) => this.handelIMAGEPREFIX(e)} />
