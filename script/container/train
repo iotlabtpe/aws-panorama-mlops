@@ -17,7 +17,7 @@ python /opt/code/train_valid_split.py --data_yaml $data
 python /opt/yolov5/train.py --img $img --batch $batch --hyp $hyp --epochs $epochs --data $data \
 --cfg $yolo --weights $weight --name $name
 #python /opt/yolov5/export.py --weights /opt/yolov5/runs/train/$name/weights/best.pt --include  onnx
-python /opt/yolov5/export_trt7_onnx.py --weights /opt/yolov5/runs/train/$name/weights/best.pt --include  onnx
+python /opt/yolov5/export_onnx.py --weights /opt/yolov5/runs/train/$name/weights/best.pt --target_trt_version 7 --dynamic
 
 pwd
 ls /opt
