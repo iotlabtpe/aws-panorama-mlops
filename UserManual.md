@@ -28,20 +28,26 @@ Click on **Packaged Application** on the left menu, the below table will be empt
 
 <img width="1788" alt="Screen Shot 2022-08-24 at 2 24 28 PM" src="https://user-images.githubusercontent.com/61721490/186345931-8bb9e5d3-c597-4656-9f90-7dac6f0c6265.png">
 
-Click on **New training, and just click on Submit,** we don’t have to input anything dataset for our sample APP
+Click on **New Package** Here you have two option 
+1. If you just want to use default model( coco dataset + yolov5 model ) + sample app then you can just select **Packaging** in **Application Method**, you can then skip input a s3 bucket and choose our sample application then click on **Submit**
+2. If you want to use your own bucket as the training dataset, then you can choose **Training + Packaging** and input the S3 Bucket with the training dataset you want, **Since we use yolov5 as our model**, you will need to prepare a bucket with
+ - image / your_images.jpg 
+ - label / your_images_label.txt 
+ 
+then again choose the sample application and click on **Submit**
 
-<img width="1784" alt="Screen Shot 2022-08-24 at 2 25 16 PM" src="https://user-images.githubusercontent.com/61721490/186345986-ed905df5-82e9-486c-bd86-3f8f6d3fd98d.png">
+![Screen Shot 2022-10-03 at 1 08 46 PM](https://user-images.githubusercontent.com/61721490/193505394-9ad5528c-081e-4af4-beab-1a89a586a186.png)
 
 
 After that you will **see a field with training icon in your application, it means the training begin**, you can do other steps and come back after the training finished 
 
 ![Screen Shot 2022-08-29 at 1 37 15 PM](https://user-images.githubusercontent.com/61721490/187130256-d8e42f11-1027-4ba8-9d7a-c9c6beacd18e.png)
 
-The training has two phase, the first phase is to output a model to your **retrain bucket** which shows below 
+The training has two phase, the first phase is **Training** ( If you only choose Packaging then this step will be skipped )
 
-<img width="1772" alt="Screen Shot 2022-08-24 at 2 26 03 PM" src="https://user-images.githubusercontent.com/61721490/186346129-74ef2cd8-fda0-43d9-9b5c-3d594a48d596.png">
+![Screen Shot 2022-10-03 at 1 25 29 PM](https://user-images.githubusercontent.com/61721490/193506911-1c35d97c-4692-490a-a7cb-0ccfcb9027ed.png)
 
-The next phase is to output a **graph.json  in your app-graph bucket which you could use to deploy Panorama,** you can spot the difference by observing the ModelStorage field. **When you see ModelStorage has s3://app-graph...,** then it means you are done with the training.
+The next phase is **Packaging** which will output a **graph.json  in your app-graph bucket which you could use to deploy Panorama,**. **When you see ModelStorage has s3://app-graph..., and your status is Completed** then it means you are done with the training.
 
 You will need to copy the ModelStorage **s3://app-graph... in the Deploy with the PPE step**
 
