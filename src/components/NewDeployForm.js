@@ -180,20 +180,20 @@ class NewDeployForm extends React.Component {
     let result = "";
 
     console.log(payload);
-    // API.post('backend', '/createDeployment', { body: payload }).then(response => {
-    //   console.log(response);
-    //   if (response) { 
-    //     this.setState({ post_result: response }, () => {
-    //       this.setState({ visible: true })
-    //     })
-    //   }
-    //   // console.log(result)
-    // }).catch((e)=>{
-    //   console.log(e) 
-    //   this.setState({ post_result: "Something wrong with the input" }, () => {
-    //     this.setState({ visible: true })
-    //   })
-    // })
+    API.post('backend', '/createDeployment', { body: payload }).then(response => {
+      console.log(response);
+      if (response) { 
+        this.setState({ post_result: response }, () => {
+          this.setState({ visible: true })
+        })
+      }
+      // console.log(result)
+    }).catch((e)=>{
+      console.log(e) 
+      this.setState({ post_result: "Something wrong with the input" }, () => {
+        this.setState({ visible: true })
+      })
+    })
   }
 
   closeModel() {
