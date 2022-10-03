@@ -17,10 +17,9 @@ import { nanoid } from 'nanoid'
 
 import ExpandableSection from 'aws-northstar/components/ExpandableSection'
 
-import ReactHlsPlayer from 'react-hls-player';
+// import ReactHlsPlayer from 'react-hls-player';
 
 
-import axios from 'axios'
 
 // import { createHashHistory } from 'history';
 // const hashHistory = createHashHistory();
@@ -223,32 +222,32 @@ class  LiveMonitoring extends React.Component {
   async load_event_data(){
     this.setState({loading_event:true})
     const url = "/ppe_monitoring/event/"+ this.state.current[0].camera_id
-    await axios.get(url, {dataType: 'json'}).then(res => {
-        this.setState({loading:false})
-        if (res.data){
-            var _tmp_data = []
-            res.data.forEach((item,index)=>{
-                var _tmp = {}
-                // const _id = nanoid()
+    // await axios.get(url, {dataType: 'json'}).then(res => {
+    //     this.setState({loading:false})
+    //     if (res.data){
+    //         var _tmp_data = []
+    //         res.data.forEach((item,index)=>{
+    //             var _tmp = {}
+    //             // const _id = nanoid()
 
-                _tmp['id'] = index
-                _tmp['key'] = nanoid()
-                _tmp['camera_id'] = item['camera_id']
-                _tmp['time_stamp'] = item['time_stamp']
-                _tmp['event_message'] = JSON.stringify(item['payload'])
+    //             _tmp['id'] = index
+    //             _tmp['key'] = nanoid()
+    //             _tmp['camera_id'] = item['camera_id']
+    //             _tmp['time_stamp'] = item['time_stamp']
+    //             _tmp['event_message'] = JSON.stringify(item['payload'])
 
-                _tmp_data.push(_tmp)
-            });
+    //             _tmp_data.push(_tmp)
+    //         });
 
-            this.setState({
-                event_list:_tmp_data
-            },()=>{
-                this.setState({loading_event:false})
-            })
-        }
-        // console.log(this.state.model_list)
-        return res.data
-    })
+    //         this.setState({
+    //             event_list:_tmp_data
+    //         },()=>{
+    //             this.setState({loading_event:false})
+    //         })
+    //     }
+    //     // console.log(this.state.model_list)
+    //     return res.data
+    // })
   }
 
 
@@ -293,34 +292,34 @@ class  LiveMonitoring extends React.Component {
       // var result = "=> call"  + apiUrl + "\n";
       var result = "";
   
-      this.setState({btnDisable:true},()=>{
-        axios({ method: 'POST', url: `${apiUrl}`, data: payload ,headers: HEADERS}).then(response => {
-            // console.log(response);
-            if (response.status === 200) {
-                result = "Update Monitoring status successfully !"
-                var _tmp = this.state.monitoring_list
-                _tmp[this.state.curent_id].is_monitoring = payload.is_monitoring
+    //   this.setState({btnDisable:true},()=>{
+    //     axios({ method: 'POST', url: `${apiUrl}`, data: payload ,headers: HEADERS}).then(response => {
+    //         // console.log(response);
+    //         if (response.status === 200) {
+    //             result = "Update Monitoring status successfully !"
+    //             var _tmp = this.state.monitoring_list
+    //             _tmp[this.state.curent_id].is_monitoring = payload.is_monitoring
 
-                var _btnText = this.props.t("Start Monitoring")
-                if( payload.is_monitoring){
-                    _btnText =  this.props.t("Stop Monitoring")
-                }
+    //             var _btnText = this.props.t("Start Monitoring")
+    //             if( payload.is_monitoring){
+    //                 _btnText =  this.props.t("Stop Monitoring")
+    //             }
   
-                 this.setState({
-                     monitoring_list:_tmp,
-                     current:[_tmp[this.state.curent_id]],
-                     btnText:_btnText
-                  },()=>{
-                 this.setState({btnDisable:false})
-              })
+    //              this.setState({
+    //                  monitoring_list:_tmp,
+    //                  current:[_tmp[this.state.curent_id]],
+    //                  btnText:_btnText
+    //               },()=>{
+    //              this.setState({btnDisable:false})
+    //           })
   
-            } else {
-                result = "Update Monitoring status error !"
-            }
-            this.setState({btnDisable:false})
-            console.log(result)
-        })
-      })
+    //         } else {
+    //             result = "Update Monitoring status error !"
+    //         }
+    //         this.setState({btnDisable:false})
+    //         console.log(result)
+    //     })
+    //   })
     //   this.setState({btnDisable:true})
   }
 
@@ -404,13 +403,13 @@ class  LiveMonitoring extends React.Component {
                                         x5-video-player-fullscreen="true"  
                                         x5-video-orientation="portraint"
                                 /> */}
-                                  <ReactHlsPlayer
+                                  {/* <ReactHlsPlayer
                                     src={(this.state.url)?this.state.url:null}
                                     autoPlay
                                     controls={false}
                                     width="100%"
                                     height="auto"
-                                />
+                                /> */}
                             </Grid>
                             <Grid item xs={12}>
                                 <ColumnLayout>

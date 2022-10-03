@@ -8,7 +8,6 @@ import { nanoid } from 'nanoid'
 import { Image } from 'react-konva';
 
 import Box from 'aws-northstar/layouts/Box';
-import axios from 'axios';
 import { API } from 'aws-amplify';
 
 import Rectangle from './Rectangle/Rectangle';

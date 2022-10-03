@@ -7,7 +7,6 @@ import FormSection from 'aws-northstar/components/FormSection';
 import Input from 'aws-northstar/components/Input';
 import Select from 'aws-northstar/components/Select';
 import Modal from 'aws-northstar/components/Modal';
-import axios from 'axios';
 import React  from 'react';
 import { connect } from 'react-redux' 
 import { API } from 'aws-amplify' 
@@ -65,44 +64,6 @@ class  ExportEventDataSetForm extends React.Component {
 
   componentDidMount(){
     this.setState({loading:true})
-    axios.get('/listinference', {dataType: 'json'}).then(res => {
-      console.log(res)
-      if (res.data){
-          // console.log(res.data)
-          var _tmp_data = []
-          var _tmp_job_option = []
-          res.data.forEach((item)=>{
-              var _tmp = {}
-              _tmp['job_id'] = item['job_id']
-              _tmp_data.push(_tmp)
-              _tmp_job_option.push({
-                  label: item['job_id'],
-                  value: item['job_id']
-              })
-          });
-
-          var _curr_job
-          var _tmp_job_select
-          // console.log(_tmp_data)
-          if(_tmp_data.length > 0){
-              _curr_job = _tmp_data[_tmp_data.length-1].job_id
-              _tmp_job_select = {
-                  name:_tmp_data[_tmp_data.length-1].job_id,
-                  value:_tmp_data[_tmp_data.length-1].job_id
-              }
-          }
-
-          this.setState({
-              // job_list: _tmp_data,
-              curr_job: _curr_job,
-              inputJobOption: _tmp_job_option,
-              job_loading: 'finished',
-              selectedJobOption:_tmp_job_select
-          })
-      }
-      // console.log(this.state.model_list)
-      return res.data
-    })
   }
 
   componentWillUnmount(){

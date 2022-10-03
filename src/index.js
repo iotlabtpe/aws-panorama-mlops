@@ -6,7 +6,6 @@ import NorthStarThemeProvider from 'aws-northstar/components/NorthStarThemeProvi
 
 import store from './store'
 import App from './App'
-import './mock/mockData'
 import './i18n/i18n'
 import awsExports from './aws-exports';
 import Amplify from 'aws-amplify';

@@ -1,7 +1,6 @@
 import Inline from 'aws-northstar/layouts/Inline';
 import React  from 'react';
 import { connect } from 'react-redux' 
-import axios from 'axios'
 import { API } from 'aws-amplify'
 // import { createHashHistory } from 'history';
 import Box from 'aws-northstar/layouts/Box'

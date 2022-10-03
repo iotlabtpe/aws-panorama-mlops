@@ -17,7 +17,7 @@ def handler(event, context):
         
         # *Need to get the AWS account id
         account_id = boto3.client("sts").get_caller_identity()["Account"]
-        training_image = account_id + ".dkr.ecr." + os.environ['REGION'] + ".amazonaws.com/gary-yolov5-train:latest"
+        training_image = account_id + ".dkr.ecr." + os.environ['REGION'] + ".amazonaws.com/yolov5-train:latest"
 
         # *S3 Related Get 
         pretrainBucket = 'pretraininput-' + random_p

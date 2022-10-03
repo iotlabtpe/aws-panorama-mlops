@@ -91,7 +91,7 @@ def handler(event, context):
             returnBody = results
 
         # The way to process data on every request 
-        if event["httpMethod"] == "POST":
+        elif event["httpMethod"] == "POST":
             body = json.loads(event['body'])
             print(event)
             returnBody = {}
@@ -117,15 +117,6 @@ def handler(event, context):
                 good = processData(item)
                 results.append(good)
             returnBody['Items'] = results
-        # elif event["httpMethod"] == "POST":
-        #     print(event["body"])
-        #     table.update_item(
-        #         Key={"CameraID": body["CameraID"], "TimeStamp": body["TimeStamp"]},
-        #         UpdateExpression="set payload = :val",
-        #         ExpressionAttributeValues={":val": body},
-        #         ReturnValues="UPDATED_NEW",
-        #     )
-        #     body = json.dumps("Update Successful")
         return {
             "statusCode": 200,
             "body": json.dumps(returnBody),

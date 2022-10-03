@@ -7,7 +7,6 @@ import { useHistory } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux'
 
-import axios from 'axios'
 import { API } from 'aws-amplify';
 
 import { withTranslation } from 'react-i18next'

@@ -4,7 +4,6 @@ import BarChart, {Bar} from 'aws-northstar/charts/BarChart';
 // import Card from 'aws-northstar/components/Card';
 // import ExpandableSection from 'aws-northstar/components/ExpandableSection';
 import { Container, Button, Inline, Column, ColumnLayout, Stack, KeyValuePair, Status, LoadingIndicator,Box, HeadingStripe } from 'aws-northstar';
-import axios from 'axios';
 import DeleteModal from './atom/DeleteModal';
 import {withTranslation} from 'react-i18next'
 import { connect } from 'react-redux' 
@@ -19,6 +18,14 @@ const MapDispatchTpProps = (dispatch) => {
     }
 }
 
+
+const response =  {
+    'name': 'test123',
+    'size': 6,
+    'cost': 5353,
+    'status': 1,
+}
+
 const ModelManageTable = ({t}) => {
     // model state
     const [loading, setLoading] = useState(false);
@@ -27,8 +34,9 @@ const ModelManageTable = ({t}) => {
     useEffect(() => {
       const getData = async()=>{
         setLoading(true);
-        const response = await axios.get('/test1');
-        setModel(response.data.data);
+
+        setModel(response);
+        
         setLoading(false);
       }
       getData();
