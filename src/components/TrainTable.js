@@ -50,7 +50,7 @@ const columnDefinitions = [
                     case 'Training':
                         return <StatusIndicator statusType="info">Training</StatusIndicator>;
                     case 'Packaging':
-                        return <StatusIndicator statusType="info">Packaing</StatusIndicator>;
+                        return <StatusIndicator statusType="info">Packaging</StatusIndicator>;
                     case 'Complete':
                         return <StatusIndicator statusType="positive">Completed</StatusIndicator>;
                     case 'Error':

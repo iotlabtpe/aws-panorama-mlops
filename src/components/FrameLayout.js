@@ -36,18 +36,19 @@ class FrameLayout extends React.Component {
     }
 
     navigationItems(t) {
-        const result = [{
-            "type": SideNavigationItemType.LINK,
-            "text": t("Monitoring"),
-            "expanded": true,
-            "items": [
-                {
-                    "type": SideNavigationItemType.LINK,
-                    "text": t("Camera Monitoring"),
-                    "href": "/"
-                },
-            ]
-        },
+        const result = [
+        // {
+        //     "type": SideNavigationItemType.LINK,
+        //     "text": t("Monitoring"),
+        //     "expanded": true,
+        //     "items": [
+        //         {
+        //             "type": SideNavigationItemType.LINK,
+        //             "text": t("Camera Monitoring"),
+        //             "href": "/"
+        //         },
+        //     ]
+        // },
         {
             "type": SideNavigationItemType.LINK,
             "text": t("Application"),

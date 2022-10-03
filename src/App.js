@@ -36,7 +36,11 @@ const App = () => (
       <Switch>
 
         {/* Monitoring */}
-        <Route exact path="/" component={CameraMonitoring}/> 
+        {/* Disable for now, after implementing KVS Sample  */}
+        {/* <Route exact path="/" component={CameraMonitoring}/>  */}
+
+
+        <Route exact path="/" component={StoredApplicationCfgList}/> 
 
 
         {/* Application 

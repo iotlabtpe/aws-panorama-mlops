@@ -42,9 +42,15 @@ class NewDeployForm extends React.Component {
       Devices: [],
       All_Devices_Options: [],
       Chose_Device: {},
-      Chose_Device_UUID: "device-ylaq25peslngbrowu2bmlqxp24",
+      Chose_Device_UUID: "",
 
-      targetArn: 's3://app-graph-4c1bb430-172b-11ed-b380-0647bab7fb5a/graph/ppa-2022-08-08-16-00-25/graph.json',
+      //Application Data 
+      Applications: [], 
+      All_Applications_Options: [],
+      Chose_Application: {},
+      Chose_Application_S3_Uri: "",
+
+      targetArn: '',
       deploymentName: 'Deployment-APP',
 
       errorDeploymentName: false,
@@ -127,6 +133,36 @@ class NewDeployForm extends React.Component {
       // console.log(this.state.model_list)
       return res
     })
+
+    await API.get('backend', '/listModel').then(res => {
+      console.log(res)
+      if(res){
+        if (res.Items) {
+          // console.log(res.data)
+          let _tmp_data = []
+          let option_data = []
+          res.Items.forEach((item) => {
+              // must first complete the training before packaging 
+              if(item['stage'] === 'Complete'){
+                let _tmp = {}
+                let application_option = {}
+
+                _tmp['model_name'] = item['model_name']
+                _tmp['trainingJobModelDataUrl'] = item['trainingJobModelDataUrl']
+                application_option['label'] = item['model_name']
+                application_option['value'] = item['trainingJobModelDataUrl']
+                _tmp_data.push(_tmp)
+                option_data.push(application_option)
+                console.log("one")
+              }
+          });
+          this.setState({ All_Applications_Options: option_data });
+          this.setState({ Applications: _tmp_data }, () => {
+            this.setState({ loading: false })
+          })
+        }
+      }
+    })
   }
 
   submit() {
@@ -134,7 +170,7 @@ class NewDeployForm extends React.Component {
     const payload = {
       "deviceId": this.state.Chose_Device_UUID,
       "cameraNames": this.state.Chose_Camera_Name,
-      "targetArn": this.state.targetArn,
+      "targetArn": this.state.Chose_Application_S3_Uri,
       "deploymentName": this.state.deploymentName,
     };
 
@@ -144,20 +180,20 @@ class NewDeployForm extends React.Component {
     let result = "";
 
     console.log(payload);
-    API.post('backend', '/createDeployment', { body: payload }).then(response => {
-      console.log(response);
-      if (response) { 
-        this.setState({ post_result: response }, () => {
-          this.setState({ visible: true })
-        })
-      }
-      // console.log(result)
-    }).catch((e)=>{
-      console.log(e) 
-      this.setState({ post_result: "Something wrong with the input" }, () => {
-        this.setState({ visible: true })
-      })
-    })
+    // API.post('backend', '/createDeployment', { body: payload }).then(response => {
+    //   console.log(response);
+    //   if (response) { 
+    //     this.setState({ post_result: response }, () => {
+    //       this.setState({ visible: true })
+    //     })
+    //   }
+    //   // console.log(result)
+    // }).catch((e)=>{
+    //   console.log(e) 
+    //   this.setState({ post_result: "Something wrong with the input" }, () => {
+    //     this.setState({ visible: true })
+    //   })
+    // })
   }
 
   closeModel() {
@@ -167,16 +203,6 @@ class NewDeployForm extends React.Component {
 
   handelInputChange(e, key) {
   
-    if(key === 'targetArn'){
-      console.log('true')
-      if(/\s/g.test(e) === true || e === ""){
-        console.log('have space')
-        this.setState({ errorS3Uri : true})
-      }
-      else{
-        this.setState({ errorS3Uri : false})
-      }
-    }
     if(key === 'deploymentName'){
       console.log('true')
       if(/\s/g.test(e) === true || e === "" ){
@@ -212,7 +238,16 @@ class NewDeployForm extends React.Component {
     const uuid = this.state.Devices.find((o) => o.Name === e.target.value).DeviceId;
     this.setState({ Chose_Device_UUID: uuid });
     this.setState({ Chose_Device: selected })
+  }
 
+  handleApplicationSelectedChange(e){
+    console.log(e.target.value)
+    const selected = this.state.All_Applications_Options.find((o) => o.value === e.target.value);
+    const s3_uri = this.state.Applications.find((o)=> o.trainingJobModelDataUrl === e.target.value).trainingJobModelDataUrl;
+
+    console.log(s3_uri)
+    this.setState({ Chose_Application_S3_Uri: s3_uri})
+    this.setState({ Chose_Application: selected})
   }
 
 
@@ -228,7 +263,7 @@ class NewDeployForm extends React.Component {
           actions={
             <div>
               {/* <Button variant="link">Cancel</Button> */}
-              <Button variant="primary" onClick={() => this.submit()} disabled={this.state.errorDeploymentName || this.state.errorS3Uri ? true : false }  >Submit</Button>
+              <Button variant="primary" onClick={() => this.submit()} disabled={this.state.errorDeploymentName  || this.state.Chose_Application_S3_Uri === "" || this.state.Chose_Device_UUID === "" || this.state.Chose_Camera_Name === "" ? true : false }  >Submit</Button>
             </div>
           }
           onSubmit={(e) => this.handleDeploy(e)}
@@ -266,7 +301,12 @@ class NewDeployForm extends React.Component {
             </FormField>
 
             <FormField label="Graph.json Target S3 Position" controlId="formFieldId5" errorText={ this.state.errorS3Uri ? 'Your input is not correct' : undefined  } >
-              <Input type="text" controlId="input_targetArn" value={this.state.targetArn} onChange={(e) => this.handelInputChange(e, 'targetArn')} />
+              {/* <Input type="text" controlId="input_targetArn" value={this.state.targetArn} onChange={(e) => this.handelInputChange(e, 'targetArn')} /> */}
+              <Select
+                options={this.state.All_Applications_Options}
+                onChange={(e) => this.handleApplicationSelectedChange(e)}
+                selectedOption={this.state.Chose_Application}
+              />
             </FormField>
 
           </FormSection>
