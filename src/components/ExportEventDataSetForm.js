@@ -27,7 +27,7 @@ class  ExportEventDataSetForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      S3IN:"s3://export-event-cd14bfe0-1231-11ed-b64e-06ca11bc4d14",
+      S3IN:"",
       IMGPREFIX:"images",
       LABELPREFIX:"labels",
       visible:false,
@@ -38,12 +38,12 @@ class  ExportEventDataSetForm extends React.Component {
       curr_job:null,
 
       tagOptions:[
-        {value:'1',label:'口罩'},
-        {value:'2',label:'安全帽'},
-        {value:'3',label:'人'}
+        {value:'1',label:'Mask'},
+        {value:'2',label:'Helmet'},
+        {value:'3',label:'People'}
 
       ],
-      tagSelectedOption:{name:'口罩',value:'1'},
+      tagSelectedOption:{name:'People',value:'3'},
       // curr_type:"true"
 
 
@@ -63,10 +63,22 @@ class  ExportEventDataSetForm extends React.Component {
 
 
   componentDidMount(){
+    this.loadData()
     this.setState({loading:true})
   }
 
   componentWillUnmount(){
+
+  }
+
+  async loadData(){
+    await API.get('backend', '/listExportBucket').then(response => {
+      if(response){
+        console.log(response)
+        this.setState({S3IN: 's3://export-event-' + response})
+      }
+
+    })
 
   }
 

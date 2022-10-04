@@ -90,7 +90,33 @@ def handler(event, context):
                 },
             }
     elif event['httpMethod'] == 'DELETE':
-        pass     
+        try:
+            body = json.loads(event["body"])
+            s3.delete_object(
+                Bucket=bucket,
+                Key=body['key']
+            )
+            return {
+                'statusCode': 200,
+                'body': json.dumps("Delete Success!!!"),
+                "headers": {
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+            }
+
+
+        except:
+            return {
+                'statusCode': 404,
+                'body': json.dumps("Make sure the object exists!!!"),
+                "headers": {
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*",
+                },
+            }     
 
 def upload_file(file, s3bucket, s3key):
     print("Uploading...")

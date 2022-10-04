@@ -105,6 +105,13 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/listExportBucket": {
+      "name": "/listExportBucket",
+      "lambdaFunction": "exportBucketLambda",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

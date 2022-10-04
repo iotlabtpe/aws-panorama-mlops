@@ -58,6 +58,11 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "exportBucketLambda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "auth": {
@@ -158,6 +163,14 @@
         {
           "category": "function",
           "resourceName": "listEvent",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "exportBucketLambda",
           "attributes": [
             "Name",
             "Arn"

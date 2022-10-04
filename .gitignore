@@ -19,3 +19,5 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 amplify/team-provider-info.json
 amplify/backend/function/*/dist/*
+
+.DS_Store

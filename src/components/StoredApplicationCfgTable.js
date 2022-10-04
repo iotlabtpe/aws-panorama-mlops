@@ -89,10 +89,10 @@ class StoredApplicationCfgTable extends React.Component {
 
     async delete_application() {
         const payload = {
-            "PackageId": this.state.current[0]['PackageId']
+            "key": this.state.current[0]['appName']
         }
         console.log(payload)
-        const response = await API.del('backend', '/camera', { body: payload })
+        const response = await API.del('backend', '/deleteStoredApplication', { body: payload })
 
         this.setState({ visible: true })
         this.setState({ responseMessage: response })
