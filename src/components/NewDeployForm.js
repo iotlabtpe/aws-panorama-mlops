@@ -137,11 +137,11 @@ class NewDeployForm extends React.Component {
     await API.get('backend', '/listModel').then(res => {
       console.log(res)
       if(res){
-        if (res.Items) {
+        if (res) {
           // console.log(res.data)
           let _tmp_data = []
           let option_data = []
-          res.Items.forEach((item) => {
+          res.forEach((item) => {
               // must first complete the training before packaging 
               if(item['stage'] === 'Complete'){
                 let _tmp = {}
