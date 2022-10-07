@@ -190,7 +190,7 @@ class NewDeployForm extends React.Component {
       // console.log(result)
     }).catch((e)=>{
       console.log(e) 
-      this.setState({ post_result: "Something wrong with the input" }, () => {
+      this.setState({ post_result: e.response.data }, () => {
         this.setState({ visible: true })
       })
     })
@@ -263,7 +263,7 @@ class NewDeployForm extends React.Component {
           actions={
             <div>
               {/* <Button variant="link">Cancel</Button> */}
-              <Button variant="primary" onClick={() => this.submit()} disabled={this.state.errorDeploymentName  || this.state.Chose_Application_S3_Uri === "" || this.state.Chose_Device_UUID === "" || this.state.Chose_Camera_Name === "" ? true : false }  >Submit</Button>
+              <Button variant="primary" onClick={() => this.submit()} disabled={ this.state.Chose_Application_S3_Uri === "" || this.state.Chose_Device_UUID === "" || this.state.Chose_Camera_Name === "" ? true : false }  >Submit</Button>
             </div>
           }
           onSubmit={(e) => this.handleDeploy(e)}

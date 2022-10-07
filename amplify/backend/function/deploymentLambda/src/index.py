@@ -23,7 +23,6 @@ def eprint(*args, **kwargs):
 
 def post(event, account_id):
     print(event)
-    eprint("env", env_p)
     s3 = boto3.resource("s3")
     pano_client = boto3.client("panorama")
     body = json.loads(event["body"])
@@ -76,7 +75,7 @@ def post(event, account_id):
         eprint(e)
         return {
             "statusCode": 500,
-            "body": "Download graph.json fail!!",
+            "body": json.dumps(str(e)),
             "headers": {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
@@ -109,7 +108,7 @@ def post(event, account_id):
         eprint(e)
         return {
             "statusCode": 500,
-            "body": "Panorama Deployment fail!!",
+            "body": json.dumps(str(e)),
             "headers": {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
