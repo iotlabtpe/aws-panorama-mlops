@@ -1,0 +1,11 @@
+[
+  {
+    "Action": [
+      "dynamodb:*",
+      "ssm:*"
+    ],
+    "Resource": [
+      "*"
+    ]
+  }
+]

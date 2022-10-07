@@ -4,12 +4,14 @@ import { Text, Box, Heading, Button, Inline } from 'aws-northstar';
 import Input from 'aws-northstar/components/Input'
 import Icon from 'aws-northstar/components/Icon';
 
-const DeleteModal = ({title,deleteModal, setDeleteModal}) => {
+const DeleteModal = ({title,deleteModal, setDeleteModal, deleteSubmit}) => {
    const [deleteInput, setDeleteInput] = useState('');
+   
+
    const footer = (
     <Inline>
         <Button type='reset' variant='link' onClick={()=>setDeleteModal(false)}>Cancel</Button>
-        <Button disabled={deleteInput === title ?  false : true }>Delete</Button>
+        <Button onClick={(e)=> deleteSubmit(title) } disabled={deleteInput === title ?  false : true }>Delete</Button>
     </Inline>
    )
 
@@ -23,7 +25,7 @@ const DeleteModal = ({title,deleteModal, setDeleteModal}) => {
             <Box marginRight="5px">
                 <Icon name='Warning' fontSize="default" htmlColor='red'/>
             </Box>
-        <Heading variant='h4'>You should make sure the application is not attatching to any existing AWS Panorama devices.</Heading>
+        <Heading variant='h4'>We only delete the record, but we didn't delete the package in Panorama Console</Heading>
         </Box>
 
         <br/>

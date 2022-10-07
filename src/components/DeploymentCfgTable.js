@@ -23,7 +23,7 @@ const columnDefinitions = [
     {
         'id': 'ApplicationInstanceId',
         width: 200,
-        Header: 'Applicatino ID',
+        Header: 'Application ID',
         accessor: 'ApplicationInstanceId'
     },
     {

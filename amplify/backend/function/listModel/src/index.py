@@ -10,9 +10,13 @@ table = db.Table(TABLE_NAME)
 
 def handler(event, context):
 
-    response = table.scan()
-    print(response)
-    body = json.dumps(response)
+    response = table.scan(Limit=100)
+
+    datas = response['Items']
+    while 'LastEvaluatedKey' in response:
+        response = table.scan(Limit=100, ExclusiveStartKey=response['LastEvaluatedKey'])
+        datas.update(response['Items'])
+    body = json.dumps(datas)
     return {
         "statusCode": 200,
         "body": body,

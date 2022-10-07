@@ -72,8 +72,9 @@ class  NewCameraForm extends React.Component {
           this.setState({visible:true})
         })
         // console.log(result)
-    }).catch(()=>{
-      this.setState({post_result:"There are something wrong with the request"},()=>{
+    }).catch((error)=>{
+      console.log(error.response.data)
+      this.setState({post_result: error.response.data},()=>{
         this.setState({visible:true})
       })
     })
@@ -92,24 +93,6 @@ class  NewCameraForm extends React.Component {
       else{
         this.setState({ errorStreamUrl : false})
       }
-    }
-    else if( key === 'username'){
-      if(/\s/g.test(e) === true || e === "" ){
-        this.setState({ errorUserName : true})
-      }
-      else{
-        this.setState({ errorUserName : false})
-      }
-
-    }
-    else if( key === 'password'){
-      if(/\s/g.test(e) === true || e === ""){
-        this.setState({ errorPassword : true})
-      }
-      else{
-        this.setState({ errorPassword : false})
-      }
-
     }
     else if ( key === 'cameraName'){
       if(/\s/g.test(e) === true || e === ""){
@@ -138,7 +121,7 @@ class  NewCameraForm extends React.Component {
             actions={
                 <div>
                     {/* <Button variant="link">Cancel</Button> */}
-                    <Button variant="primary" onClick={() => this.submit()}  disabled={this.state.errorCameraName || this.state.errorPassword || this.state.errorStreamUrl || this.state.errorUserName ? true : false }  >Submit</Button>
+                    <Button variant="primary" onClick={() => this.submit()}  disabled={this.state.errorCameraName || this.state.errorStreamUrl  ? true : false }  >Submit</Button>
                 </div>
             }
             onSubmit={console.log}
@@ -157,11 +140,11 @@ class  NewCameraForm extends React.Component {
                   <Textarea classname="LabelText" rows="10"  readonly={false} value={this.state.description} onChange={(e)=>this.handleTextChange(e,'description')}> </Textarea> 
                 </FormField>
 
-                <FormField label="Username" controlId="formFieldId4" errorText={ this.state.errorUserName ? 'Your input is not correct' : undefined  } >
+                <FormField label="Username" controlId="formFieldId4" >
                     <Input type="text" controlId="username" value={this.state.username} onChange={(e)=> this.handelInputChange(e,'username')}  />
                 </FormField>
 
-                <FormField label="Password" controlId="formFieldId5" errorText={ this.state.errorPassword ? 'Your input is not correct' : undefined  }>
+                <FormField label="Password" controlId="formFieldId5">
                     <Input type="text" controlId="password" value={this.state.password} onChange={(e)=> this.handelInputChange(e,'password')}  />
                 </FormField>
             </FormSection>

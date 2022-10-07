@@ -112,6 +112,20 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/deleteModel": {
+      "name": "/deleteModel",
+      "lambdaFunction": "deleteModel",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/deleteEvent": {
+      "name": "/deleteEvent",
+      "lambdaFunction": "deleteEvent",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

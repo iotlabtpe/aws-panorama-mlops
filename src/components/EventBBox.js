@@ -8,6 +8,7 @@ import { nanoid } from 'nanoid'
 import { Image } from 'react-konva';
 
 import Box from 'aws-northstar/layouts/Box';
+import Button from 'aws-northstar/components/Button'
 import { API } from 'aws-amplify';
 
 import Rectangle from './Rectangle/Rectangle';
@@ -643,33 +644,24 @@ class EventBBox extends React.Component {
 
   }
 
-  removeOne(){
-      const {
-        rectangles,selectedShapeName,bbox_type_dict
-      } = this.state;
+  async removeOne(){
+    console.log('Data',this.props.data)
+    const payload = {
+      'CameraID': this.props.data.CameraID,
+      'TimeStamp':this.props.data.TimeStamp
+    }
 
-      // console.log(selectedShapeName)
-      if ( selectedShapeName  && selectedShapeName !== '' ){
-        const rect = rectangles.find(r => r.name === selectedShapeName);
-        if (rect) {
-          var _rectangles = [];
-          rectangles.forEach((item)=>{
-            if (item.name !== selectedShapeName) {
-              _rectangles.push(item)
-            }
-          })
-          
-          if( bbox_type_dict[selectedShapeName] ) delete bbox_type_dict[selectedShapeName];
+    console.log(payload)
+    await API.del('backend','/deleteEvent', { body: payload }).then(response => {
+        if(response){
+          alert("Successfully Delete the data!")
+        }
+    }).catch((e)=>{
+      alert(e.response.data)
+    })
 
-          this.setState({
-            modified:true,
-            selectedShapeName: '',
-            rectangles:_rectangles,
-            rectCount:_rectangles.length,
-            bbox_type_dict
-          });
-        } 
-      }
+    window.location.reload()
+
   }
 
   removeAll(){
@@ -743,8 +735,8 @@ onHelmetChange(e){
               <RadioGroup
                 items={[
                     <RadioButton key="" value="0" onChange={(e) =>{this.onHelmetChange(e)}}>person(red)</RadioButton>, 
-                    <RadioButton key="" value="1" onChange={(e) =>{this.onHelmetChange(e)}}>head(green)</RadioButton>,
-                    <RadioButton key="" value="2" onChange={(e) =>{this.onHelmetChange(e)}}>helmet(yellow)</RadioButton>,
+                    // <RadioButton key="" value="1" onChange={(e) =>{this.onHelmetChange(e)}}>head(green)</RadioButton>,
+                    // <RadioButton key="" value="2" onChange={(e) =>{this.onHelmetChange(e)}}>helmet(yellow)</RadioButton>,
                 ]}
                 value={this.state.helmetTag.toString()}
               />
@@ -840,41 +832,26 @@ onHelmetChange(e){
               <Grid container>
               <Grid item xs={12}>
                   {this.renderRadioGroup()}
+                  <br/>
+                  <br/>
               </Grid>
-                {/* <Grid item xs={12}>
-                        <Inline>
-                          <Toggle label={tag+':'+tag_status} checked={tag_status} onChange={(e)=>this.onToggleChange(e)} />
-                        </Inline>
-                </Grid> */}
-                <Grid item xs={12}>
-                      {/* </FormField>
-                        <FormField label="" controlId="formFieldId1"> */}
-                        {/* </FormField> */}
-                        <Inline>
-                          <button className="btn" disabled={!this.state.showSave} onClick={(e) => this.removeOne(e)}>Remove Current</button>
-                          {/* <Button disabled={!this.state.showSave} onClick={(e) => this.removeOne(e)}  >Remove Current</Button> */}
-                        </Inline>
-                        </Grid>
                 <Grid item xs={12}>
                         <Inline>
-                          <button className="btn" disabled={!this.state.showSave} onClick={(e) => this.removeAll(e)}>Remove All</button>
-                          {/* <Button disabled={!this.state.showSave} onClick={(e) => this.removeAll(e)}  >Remove All</Button> */}
+                          <Button   size='medium' disabled={!this.state.showSave} onClick={(e) => this.removeOne(e)}>Remove Data</Button>
                         </Inline>
-                        </Grid>
+                        <br/>
+                </Grid>
                 <Grid item xs={12}>
                         <Inline>
-                          <button className="btn" disabled={!this.state.showSave} onClick={(e) => this.save(e)}>Confirm Data</button>
-                          {/* <Button size="large" disabled={!this.state.showSave} onClick={(e) => this.save(e)}  >Confirm Data</Button> */}
+                          <Button variant="primary" size='medium' disabled={!this.state.showSave} onClick={(e) => this.save(e)}>Confirm Data</Button>
                           </Inline>
-                          </Grid>
+                          <br/>
+                </Grid>
                 <Grid item xs={12}>
                           {status_ack} 
                           {status_modified}
                           </Grid>
                 </Grid>            
-                    {/* </FormSection> */}
-                {/* </Form> */}
-              {/* </Box> */}
             </Grid>
           </Grid>
       </Container>

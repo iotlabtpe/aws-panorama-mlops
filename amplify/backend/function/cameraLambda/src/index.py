@@ -13,16 +13,22 @@ def post(event):
     body = json.loads(event["body"])
 
     CAMERA_NAME = body["cameraName"]
-    CAMERA_CREDS = {
-        "Username": body["username"],
-        "Password": body["password"],
-        "StreamUrl": body["streamUrl"],
-    }
-
+     
+    if body['username'] != '' and body['password'] != '':
+        CAMERA_CREDS = {
+            "Username": body["username"],
+            "Password": body["password"],
+            "StreamUrl": body["streamUrl"],
+        }
+    else:
+        CAMERA_CREDS = {
+            "StreamUrl": body["streamUrl"],
+        }
     print(body["description"])
 
     try:
         pano_client.create_node_from_template_job(
+            NodeDescription=body['description'],
             NodeName=CAMERA_NAME,
             OutputPackageName=CAMERA_NAME,
             OutputPackageVersion="1.0",
@@ -43,7 +49,7 @@ def post(event):
         eprint(e)
         return {
             "statusCode": 404,
-            "body": "Camera Error",
+            "body": str(e),
             "headers": {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
@@ -59,20 +65,30 @@ def get(event):
     panorama_client = boto3.client("panorama")
 
     try:
-        response = panorama_client.list_nodes(MaxResults=25)
+        response = panorama_client.list_nodes(
+            MaxResults=10,
+            Category='MEDIA_SOURCE'
+        )
+
+        results = []
+        if "Nodes" in response:   
+            results = response["Nodes"]
+        while 'NextToken' in response: 
+            response = panorama_client.list_nodes(MaxResults=10, Category='MEDIA_SOURCE', NextToken=response['NextToken'])
+            results+= response["Nodes"]
+
         cameras = []
-        for node in response["Nodes"]:
+        for node in results:
+            response = panorama_client.describe_node(
+                NodeId=node['NodeId'],
+            )
             camera = {}
-            camera["NodeId"] = node["NodeId"]
-            camera["Name"] = node["Name"]
-            camera["CreatedTime"] = node["CreatedTime"].strftime("%Y/%m/%d, %H:%M:%S")
-            camera["PackageId"] = node["PackageId"]
-            eprint(node["NodeId"])
-            eprint(node["Name"])
-            if "Description" in node:
-                camera["Description"] = node["Description"]
-                eprint(node["Description"])
-            eprint(node["CreatedTime"].strftime("%Y/%m/%d, %H:%M:%S"))
+            camera["NodeId"] = response["NodeId"]
+            camera["Name"] = response["Name"]
+            camera["CreatedTime"] = response["CreatedTime"].strftime("%Y/%m/%d, %H:%M:%S")
+            if 'Description' in response:
+                camera['Description'] = response['Description']
+            camera["PackageId"] = response["PackageId"]
             cameras.append(camera)
 
         return {

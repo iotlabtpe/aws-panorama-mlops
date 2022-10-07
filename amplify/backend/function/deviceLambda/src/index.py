@@ -6,7 +6,6 @@ import sys
 env_p = boto3.client("ssm").get_parameter(Name="/ppe/env/" + os.environ["ENV"])["Parameter"]["Value"]
 panorama_client = boto3.client("panorama")
 
-TABLE_NAME = "Device-" + env_p
 # Hack to print to stderr so it appears in CloudWatch.
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -19,9 +18,18 @@ def get(event):
 
 
     try:
-        response = panorama_client.list_devices()
+        response = panorama_client.list_devices(
+            MaxResults=10
+        )
+        results = []
+        if "Devices" in response:   
+            results = response["Devices"]
+        while 'NextToken' in response: 
+            response = panorama_client.list_devices(MaxResults=10, NextToken=response['NextToken'])
+            results+= response["Devices"]
+
         devices = []
-        for node in response["Devices"]:
+        for node in results:
             device = {}
             device["DeviceId"] = node["DeviceId"]
             device["Name"] = node["Name"]

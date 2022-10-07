@@ -66,7 +66,7 @@ const columnDefinitions = [
     },
     {
         'id': 'trainingjob.creation_time',
-        width: 150,
+        width: 200,
         Header: 'Created Date',
         accessor: 'creation_time'
     },   
@@ -90,10 +90,10 @@ const TrainTable_v2 = ({ t }) => {
             setLoading(true);
             await API.get('backend', '/listModel').then(res => {
                 console.log(res)
-                if (res.Items) {
+                if (res) {
                     // console.log(res.data)
                     const _tmp_data = []
-                    res.Items.forEach((item) => {
+                    res.forEach((item) => {
                         var _tmp = {}
                         _tmp['status'] = item['trainingJobStatus']
                         _tmp['model_data_url'] = item['trainingJobModelDataUrl']
@@ -129,6 +129,21 @@ const TrainTable_v2 = ({ t }) => {
         history.push(`/CloneModelConfig/${current.model_name}`)
     }
 
+    const deleteModel = async(title) => {
+        console.log('paste')
+        const payload = {
+            'model_name':title
+        }
+        await API.del('backend','/deleteModel', { body: payload }).then(response => {
+            if(response){
+                console.log('Call')
+            }
+        }).catch((e)=>{
+            console.log(e)
+        })
+
+        window.location.reload()
+    }
     const tableActions = (
 
         <Inline>
@@ -151,7 +166,7 @@ const TrainTable_v2 = ({ t }) => {
     );
     return (
         <>
-            <DeleteModal title={current.length === 0 ? 'Start' : current[0].model_name} setDeleteModal={setDeleteModal} deleteModal={deleteModal} />
+            <DeleteModal title={current.length === 0 ? 'Start' : current[0].model_name} setDeleteModal={setDeleteModal} deleteModal={deleteModal} deleteSubmit={deleteModel} />
             <Table
                 id="TrainTable"
                 actionGroup={tableActions}

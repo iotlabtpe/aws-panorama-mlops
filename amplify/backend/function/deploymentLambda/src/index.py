@@ -96,7 +96,7 @@ def post(event, account_id):
         eprint(resp)
         return {
             "statusCode": 200,
-            "body": "Panorama Deployment Successful!!",
+            "body": "Panorama Deployment Started!!",
             "headers": {
                 "Access-Control-Allow-Headers": "*",
                 "Access-Control-Allow-Origin": "*",
@@ -124,11 +124,19 @@ def get(event):
     panorama_client = boto3.client("panorama")
 
     try:
-        response = panorama_client.list_application_instances(MaxResults=25)
+        response = panorama_client.list_application_instances(MaxResults=10)
+        results = []
+        if "ApplicationInstances" in response:   
+            results = response["ApplicationInstances"]
+        while 'NextToken' in response: 
+            response = panorama_client.list_application_instances(MaxResults=10, NextToken=response['NextToken'])
+            results+= response["ApplicationInstances"]
+        
+            
         eprint(response["ResponseMetadata"]["HTTPStatusCode"])
 
         applications = []
-        for node in response["ApplicationInstances"]:
+        for node in results:
             application = {}
             application["Name"] = node["Name"]
             application["ApplicationInstanceId"] = node["ApplicationInstanceId"]

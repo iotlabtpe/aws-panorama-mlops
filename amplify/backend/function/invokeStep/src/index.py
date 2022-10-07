@@ -9,7 +9,7 @@ def handler(event, context):
         print(event)
         body = json.loads(event["body"])
         print(body)
-        name_prefix = 'ppe'
+        name_prefix = 'sample'
         model_name = name_prefix + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         # *get the env and role arn 
         random_p = random_p = boto3.client("ssm").get_parameter(Name="/ppe/random/" + os.environ["ENV"])["Parameter"]["Value"]
