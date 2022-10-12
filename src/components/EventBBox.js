@@ -227,10 +227,10 @@ class EventBBox extends React.Component {
       // console.log()
       const { tag } = this.state;
       var k = 'ack_bbox_person' 
-      console.log(k)
+      // console.log(k)
       var result = []
       // find out what output is in out
-      console.log('Item',item)
+      // console.log('Item',item)
       if(!item[k] && item.output){
         item.output.forEach((bbox) => {
           // const bbox_array = bbox.split(' ');
@@ -255,7 +255,7 @@ class EventBBox extends React.Component {
       // console.log(this.props)
       // const id = this.props.data.id
       const item = this.props.data
-      console.log(item.TimeStamp)
+      // console.log(item.TimeStamp)
       var _tmp = {}
       // _tmp['image_url'] = item.image_url
 
@@ -608,8 +608,8 @@ class EventBBox extends React.Component {
     if(modified || original_bbox !== _bbox){
       payload['manual_modified'] = modified
     }
-    console.log(this.props.data);
-    console.log(payload)
+    // console.log(this.props.data);
+    // console.log(payload)
 
     const HEADERS = {'Content-Type': 'application/json'};
     // const apiUrl = `/save_event_verified_result/${docid}`;
@@ -767,10 +767,10 @@ onHelmetChange(e){
       let status_ack = null;
       if (acknowledged & acknowledged === true) {
         status_ack = <StatusIndicator statusType="positive">Verified</StatusIndicator>;
-        console.log("Verified")
+        // console.log("Verified")
       } else {
         status_ack = <StatusIndicator statusType="warning">Waiting</StatusIndicator>;
-        console.log("Waiting")
+        // console.log("Waiting")
       }
       
   

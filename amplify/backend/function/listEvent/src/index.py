@@ -97,9 +97,12 @@ def handler(event, context):
             returnBody = {}
             if 'LastEvaluatedKey' in body:
                 print('page')
-                response = table.scan(
+                response = table.query(
                     Limit=10,
-                    ExclusiveStartKey=body['LastEvaluatedKey']
+                    ExclusiveStartKey=body['LastEvaluatedKey'],
+                    IndexName='tag-timestamp-index',
+                    KeyConditionExpression=Key('tag').eq('beta'),
+                    ScanIndexForward=False
                 )
                 if 'LastEvaluatedKey' in response:
                     response['LastEvaluatedKey']['TimeStamp'] = int(response['LastEvaluatedKey']['TimeStamp'])
@@ -107,10 +110,17 @@ def handler(event, context):
                 
             else:
                 print('first page')
-                response = table.scan(Limit=10)
+                response = table.query(
+                    Limit=10,
+                    IndexName='tag-timestamp-index',
+                    KeyConditionExpression=Key('tag').eq('beta'),
+                    ScanIndexForward=False
+                )
                 if 'LastEvaluatedKey' in response:
                     response['LastEvaluatedKey']['TimeStamp'] = int(response['LastEvaluatedKey']['TimeStamp'])
                     returnBody['LastEvaluatedKey'] = response['LastEvaluatedKey']
+                # get table's total row count 
+                returnBody['rowCount'] = table.item_count
             results = []
             print(response)
             for item in response["Items"]:

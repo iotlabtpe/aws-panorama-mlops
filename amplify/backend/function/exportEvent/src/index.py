@@ -2,6 +2,7 @@ import json
 import boto3
 import os
 from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key
 import logging
 
 
@@ -21,15 +22,33 @@ s3 = boto3.client(
 def handler(event, context):
     try:
         # body = event['body']
+
+        # TODO Pagination 
+        
         body = json.loads(event["body"])
         type = body["type"]
         s3uri = body["s3uri"]
         images_prefix = "images"
         labels_prefix = "labels"
 
-        response = table.scan(Limit=10)
-        items = response["Items"]
-        for item in items:
+        response = table.query(
+                    IndexName='tag-timestamp-index',
+                    KeyConditionExpression=Key('tag').eq('beta'),
+                    ScanIndexForward=False
+        )
+
+        datas = response['Items']
+            
+        while 'LastEvaluatedKey' in response:
+            response = table.query(
+                ExclusiveStartKey=response['LastEvaluatedKey'],
+                IndexName='tag-timestamp-index',
+                KeyConditionExpression=Key('tag').eq('beta'),
+                ScanIndexForward=False
+            )
+            datas.update(response['Items'])
+
+        for item in datas:
             print(item)
             result = post_process_hit(item["payload"], type, s3uri, images_prefix, labels_prefix)
         return {
@@ -48,13 +67,31 @@ def handler(event, context):
 def post_process_hit(payload, type, s3uri, images_prefix, labels_prefix):
     try:
         print("post_processing")
+        ack_bbox = []
         if type == "person":
             # print(payload['ack_mask'])
-            if "ack_bbox_person" in payload:
-                print(payload["ack_bbox_person"])
-                ack_bbox = payload["ack_bbox_person"]
+            if payload["acknowledged"] == True:
+                if len(payload["ack_bbox_person"]) != 0:
+                    print(payload["ack_bbox_person"])
+                    ack_bbox = payload["ack_bbox_person"]
+                else:
+                    # "label_string" : { "S" : "0 0.0921875 0.9368055555555556 0.171875 1.1125\n0 0.218359375 0.9972222222222222 0.41953125 1.0055555555555555\n" },
+                    # [[0,0.07,0.82,0.09,0.35],[0,0.07,0.82,0.09,0.35]]
+                    # "ack_bbox_person" : { "L" : [ { "L" : [ { "N" : "0" }, { "N" : "0.07" }, { "N" : "0.82" }, { "N" : "0.09" }, { "N" : "0.35" } ] } ] },
+                    # 0 0.1 0.2 0.3 0.4\n 0 0.2 0.3 0.4 
+                    # [0,0.1,0.2,0.3,0.4]
+                    print("Having none-modifed verifed data")
+                    data = payload['label_string']
+                    results = data.strip().split("\n")
+                    print(results)
+                    ack_bbox = []
+                    for result in results:
+                        labeling = result.split(" ")
+                        print("Labeling",labeling)
+                        ack_bbox.append(labeling)
             else:
-                return []
+                return ack_bbox
+                    
         else:
             ack_bbox = payload["ack_bbox_helmet"]
         # print('Ack_bbox',ack_bbox)
@@ -99,8 +136,13 @@ def post_process_hit(payload, type, s3uri, images_prefix, labels_prefix):
         label_file = open("/tmp/" + label_file_name, "w")
 
         print("start writing label_file")
-        for line in ack_bbox:
-            label_file.write(str(line[0]) + " " + str(line[1]) + " " + str(line[2]) + " " + str(line[3]) + " " + str(line[4]))
+        for count,line in enumerate(ack_bbox):
+            # not the last line 
+            print(count,line)
+            if(count != len(ack_bbox) - 1):
+                label_file.write(str(line[0]) + " " + str(line[1]) + " " + str(line[2]) + " " + str(line[3]) + " " + str(line[4]) + "\n")
+            else:
+                label_file.write(str(line[0]) + " " + str(line[1]) + " " + str(line[2]) + " " + str(line[3]) + " " + str(line[4]))
         label_file.close()
 
         upload_file("/tmp/" + label_file_name, label_s3bucket, label_s3key)
@@ -120,10 +162,6 @@ def post_process_hit(payload, type, s3uri, images_prefix, labels_prefix):
 
 
 def upload_file(file, s3bucket, s3key):
-    print("Uploading...")
-    print(file)
-    print(s3bucket)
-    print(s3key)
     if s3key is None:
         s3_key = os.path.basename(file)
 
@@ -137,8 +175,4 @@ def upload_file(file, s3bucket, s3key):
 
 
 def download_file(file, s3bucket, s3key):
-    print("Downloading...")
-    print(file)
-    print(s3bucket)
-    print(s3key)
     s3.download_file(s3bucket, s3key, file)
