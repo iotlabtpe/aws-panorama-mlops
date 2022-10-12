@@ -64,7 +64,7 @@ class ObjectDetectionApp(p.node):
         # self.deviceId = "device-7taxh6ohga2fq3pn5deivbhpxy"
         # self.cameraId = "ppe"
         self.ppe_iot_handler = PpeIot(
-            self.env, self.region, self.deviceId, self.cameraId 
+            self.env, self.region, self.deviceId, self.cameraId
         )
 
         self.cordon_area = [(0.1, 0.2, 0.3, 0.7), (0.3, 0.2, 0.5, 0.7)]
@@ -154,9 +154,9 @@ class ObjectDetectionApp(p.node):
                                 event_no,
                             ]
                             # 1 > 0｀
-                            # cp = 1 
+                            # cp = 1
                             # rb = 0 cp = 0
-                            # rb = 1 pub cp =1 
+                            # rb = 1 pub cp =1
                             if len(result_boxes) > self.current_people:
                                 self.publish(socket, send_args)
                             self.current_people = len(result_boxes)
@@ -167,12 +167,15 @@ class ObjectDetectionApp(p.node):
                                 event_no = 0
 
                     for idx in range(len(input_frames)):
+                        # Disable drawing cordon line in Panoama HDMI output.
+                        '''
                         input_frames[idx].add_rect(
                             self.cordon_area[idx][0],
                             self.cordon_area[idx][1],
                             self.cordon_area[idx][2],
                             self.cordon_area[idx][3],
                         )
+                        '''
                         input_frames[idx].add_label(f"{fps:>5.2f}", 0.9, 0.05)
                         # cv2.putText(input_frames[idx].image, f"{fps:>5.2f}", org, fontFace, fontScale, color, thickness, lineType)
 
