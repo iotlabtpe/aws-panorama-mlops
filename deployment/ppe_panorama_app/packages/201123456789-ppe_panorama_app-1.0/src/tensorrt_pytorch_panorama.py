@@ -43,13 +43,16 @@ class ObjectDetectionApp(p.node):
         self.pre_processing_output_size = 640
         self.onnx_file_path = "/panorama/yolov5s.onnx"
         self.engine_file_path = "/opt/aws/panorama/storage/yolov5s_dynamic_148.engine"
+        self.fp = 16
+        self.engine_batch_size = "1 4 8"
+        self.is_dynamic = True
         if not os.path.exists(self.engine_file_path):
-            onnx_tensorrt.onnx2tensorrt(
-                self.onnx_file_path, self.engine_file_path, dynamic_batch=[1, 4, 8]
-            )
+            os.system("python3 /panorama/onnx_tensorrt.py -i {} -o {} -p {} -b {}".format(
+                self.onnx_file_path, self.engine_file_path, self.fp, self.engine_batch_size
+            ))
 
         self.yolov5_wrapper = YoLov5TRT(
-            self.engine_file_path, self.model_batch_size, True
+            self.engine_file_path, self.model_batch_size, self.is_dynamic
         )
 
         # For PPE portal, IoT event report and camera monitoring. Hard code for demonstration.
@@ -64,7 +67,7 @@ class ObjectDetectionApp(p.node):
         # self.deviceId = "device-7taxh6ohga2fq3pn5deivbhpxy"
         # self.cameraId = "ppe"
         self.ppe_iot_handler = PpeIot(
-            self.env, self.region, self.deviceId, self.cameraId
+            self.env, self.region, self.deviceId, self.cameraId 
         )
 
         self.cordon_area = [(0.1, 0.2, 0.3, 0.7), (0.3, 0.2, 0.5, 0.7)]
