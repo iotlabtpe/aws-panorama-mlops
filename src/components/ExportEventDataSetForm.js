@@ -185,8 +185,8 @@ class  ExportEventDataSetForm extends React.Component {
                 </div>
             }
         >
-            {/*<FormSection header={t("Export Verified Event Dataset")}>
-                <FormField label="Select Type Tag " controlId="formFieldId1">
+            <FormSection header={t("Export Verified Event Dataset")}>
+                {/*<FormField label="Select Type Tag " controlId="formFieldId1">
                     <Select placeholder={'Choose job'} 
                         // statusType={this.state.job_loading} 
                         options={this.state.tagOptions}
