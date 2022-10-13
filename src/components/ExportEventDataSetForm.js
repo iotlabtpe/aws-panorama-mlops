@@ -11,6 +11,7 @@ import React  from 'react';
 import { connect } from 'react-redux' 
 import { API } from 'aws-amplify' 
 import {withTranslation} from 'react-i18next'
+import { LoadingIndicator } from 'aws-northstar';
 
 const mapStateToProps = state => {
   return { session: state.session ,language: state.lang.language, languageList: state.lang.languageList}
@@ -84,7 +85,10 @@ class  ExportEventDataSetForm extends React.Component {
 
   async submit(){
     // console.log(e)
-    const HEADERS = {'Content-Type': 'application/json'};
+    this.setState({visible:true})
+
+
+    this.setState({post_result: "loading" })   
     var _type
     if(this.state.tagSelectedOption.value === '1'){
       _type='mask'
@@ -107,23 +111,19 @@ class  ExportEventDataSetForm extends React.Component {
     }
     await API.post('backend','/exportEvent',{ body: payload}).then(response => {
         // console.log(response);
-        if (response.status === 200) {
+        if (response) {
             result = "Export the training dataset successfully !"
             // alert(result)
         } else {
             result = "Export the training dataset successfully !"
             // alert(result)
         }
-        this.setState({post_result:result},()=>{
-          this.setState({visible:true})
-        })
-        
+        this.setState({post_result:result})   
         // console.log(result)
+    }).catch((e)=>{
+      console.log(e) 
+      this.setState({ post_result: "Fail to export the data"})
     })
-
-
-
-    this.setState({visible:true})
     // this.props.history.push("/")
   }
 
@@ -166,7 +166,8 @@ class  ExportEventDataSetForm extends React.Component {
   }
 
   closeModel(){
-    
+    this.setState({ visible: false })
+    window.location.reload();
   }
 
 
@@ -213,8 +214,8 @@ class  ExportEventDataSetForm extends React.Component {
                 </FormField> */}
             </FormSection>
         </Form>
-        <Modal title="Modal" visible={this.state.visible} onClose={() => this.closeModel()}>
-            {this.state.post_result}
+        <Modal title="Export Dataset" visible={this.state.visible} onClose={() => this.closeModel()}>
+            {this.state.post_result === 'loading' ? <LoadingIndicator label="Uploading"/> : this.state.post_result }
         </Modal>
       </div>
     )
