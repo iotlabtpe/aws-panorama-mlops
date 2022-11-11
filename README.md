@@ -126,6 +126,7 @@ frontend:
   phases:
     preBuild:
       commands:
+        - npm install -g npm@6.14.17
         - npm install
     build:
       commands:
